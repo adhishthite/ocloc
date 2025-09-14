@@ -1,191 +1,73 @@
+use once_cell::sync::Lazy;
+use serde::Deserialize;
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 
-pub struct Language {
-    pub name: &'static str,
-    pub extensions: &'static [&'static str],
-    pub line_markers: &'static [&'static str],
-    pub block_markers: Option<(&'static str, &'static str)>,
+#[derive(Debug, Clone, Deserialize)]
+pub struct LanguageSpec {
+    pub name: String,
+    pub extensions: Vec<String>,
+    pub line_markers: Vec<String>,
+    pub block_markers: Option<(String, String)>,
+    #[serde(default)]
+    pub special_filenames: Vec<String>,
 }
 
-pub fn language_registry() -> &'static [Language] {
-    // Note: Keep minimal to start; expand with tests.
-    static REPO: &[Language] = &[
-        Language {
-            name: "Rust",
-            extensions: &["rs"],
-            line_markers: &["//"],
-            block_markers: Some(("/*", "*/")),
-        },
-        Language {
-            name: "Python",
-            extensions: &["py"],
-            line_markers: &["#"],
-            block_markers: None,
-        },
-        Language {
-            name: "JavaScript",
-            extensions: &["js", "jsx"],
-            line_markers: &["//"],
-            block_markers: Some(("/*", "*/")),
-        },
-        Language {
-            name: "TypeScript",
-            extensions: &["ts", "tsx"],
-            line_markers: &["//"],
-            block_markers: Some(("/*", "*/")),
-        },
-        Language {
-            name: "C",
-            extensions: &["c", "h"],
-            line_markers: &["//"],
-            block_markers: Some(("/*", "*/")),
-        },
-        Language {
-            name: "C++",
-            extensions: &["cpp", "cc", "hpp", "hh"],
-            line_markers: &["//"],
-            block_markers: Some(("/*", "*/")),
-        },
-        Language {
-            name: "Java",
-            extensions: &["java"],
-            line_markers: &["//"],
-            block_markers: Some(("/*", "*/")),
-        },
-        Language {
-            name: "Go",
-            extensions: &["go"],
-            line_markers: &["//"],
-            block_markers: Some(("/*", "*/")),
-        },
-        Language {
-            name: "Shell",
-            extensions: &["sh"],
-            line_markers: &["#"],
-            block_markers: None,
-        },
-        Language {
-            name: "Perl",
-            extensions: &["pl"],
-            line_markers: &["#"],
-            block_markers: None,
-        },
-        Language {
-            name: "Ruby",
-            extensions: &["rb"],
-            line_markers: &["#"],
-            block_markers: None,
-        },
-        Language {
-            name: "PHP",
-            extensions: &["php"],
-            line_markers: &["//", "#"],
-            block_markers: Some(("/*", "*/")),
-        },
-        Language {
-            name: "HTML",
-            extensions: &["html", "htm"],
-            line_markers: &[],
-            block_markers: Some(("<!--", "-->")),
-        },
-        Language {
-            name: "CSS",
-            extensions: &["css"],
-            line_markers: &[],
-            block_markers: Some(("/*", "*/")),
-        },
-        Language {
-            name: "Markdown",
-            extensions: &["md", "markdown", "mdown", "mkd", "mkdn", "mdx"],
-            line_markers: &[],
-            block_markers: Some(("<!--", "-->")),
-        },
-        Language {
-            name: "SVG",
-            extensions: &["svg"],
-            line_markers: &[],
-            block_markers: Some(("<!--", "-->")),
-        },
-        Language {
-            name: "XML",
-            extensions: &["xml"],
-            line_markers: &[],
-            block_markers: Some(("<!--", "-->")),
-        },
-        Language {
-            name: "YAML",
-            extensions: &["yml", "yaml"],
-            line_markers: &["#"],
-            block_markers: None,
-        },
-        Language {
-            name: "TOML",
-            extensions: &["toml"],
-            line_markers: &["#"],
-            block_markers: None,
-        },
-        Language {
-            name: "INI",
-            extensions: &["ini", "cfg", "conf", "properties"],
-            line_markers: &[";", "#"],
-            block_markers: None,
-        },
-        Language {
-            name: "Text",
-            extensions: &["txt", "text"],
-            line_markers: &[],
-            block_markers: None,
-        },
-        Language {
-            name: "reStructuredText",
-            extensions: &["rst"],
-            line_markers: &[],
-            block_markers: None,
-        },
-        Language {
-            name: "AsciiDoc",
-            extensions: &["adoc", "asciidoc"],
-            line_markers: &["//"],
-            block_markers: None,
-        },
-        Language {
-            name: "Dockerfile",
-            extensions: &[],
-            line_markers: &["#"],
-            block_markers: None,
-        },
-        Language {
-            name: "Make",
-            extensions: &[],
-            line_markers: &["#"],
-            block_markers: None,
-        },
-        Language {
-            name: "CMake",
-            extensions: &["cmake"],
-            line_markers: &["#"],
-            block_markers: None,
-        },
-    ];
-    REPO
+pub struct LanguageRegistry {
+    specs: Vec<LanguageSpec>,
+    by_ext: HashMap<String, usize>,
+    by_special: HashMap<String, usize>,
+}
+
+impl LanguageRegistry {
+    fn from_specs(specs: Vec<LanguageSpec>) -> Self {
+        let mut by_ext = HashMap::new();
+        let mut by_special = HashMap::new();
+        for (i, spec) in specs.iter().enumerate() {
+            for ext in &spec.extensions {
+                by_ext.insert(ext.to_ascii_lowercase(), i);
+            }
+            for name in &spec.special_filenames {
+                by_special.insert(name.to_ascii_lowercase(), i);
+            }
+        }
+        Self {
+            specs,
+            by_ext,
+            by_special,
+        }
+    }
+}
+
+static EMBEDDED_LANG_JSON: &str = include_str!("../assets/languages.json");
+
+pub static REGISTRY: Lazy<LanguageRegistry> = Lazy::new(|| {
+    let specs: Vec<LanguageSpec> =
+        serde_json::from_str(EMBEDDED_LANG_JSON).expect("invalid embedded languages.json");
+    LanguageRegistry::from_specs(specs)
+});
+
+pub fn language_registry() -> &'static [LanguageSpec] {
+    &REGISTRY.specs
 }
 
 pub fn find_language_for_path(path: &Path) -> Option<&'static str> {
     // 1) By extension
     if let Some(ext) = path.extension().and_then(|s| s.to_str()) {
         let ext = ext.to_ascii_lowercase();
-        for lang in language_registry() {
-            if lang.extensions.iter().any(|e| *e == ext) {
-                return Some(lang.name);
-            }
+        if let Some(&idx) = REGISTRY.by_ext.get(&ext) {
+            return Some(&language_registry()[idx].name);
         }
     }
 
     // 2) Special filenames
     if let Some(fname) = path.file_name().and_then(|s| s.to_str()) {
         let lower = fname.to_ascii_lowercase();
+        if let Some(&idx) = REGISTRY.by_special.get(&lower) {
+            return Some(&language_registry()[idx].name);
+        }
         match lower.as_str() {
             "makefile" => return Some("Make"),
             "dockerfile" => return Some("Dockerfile"),

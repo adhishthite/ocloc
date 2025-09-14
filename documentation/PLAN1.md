@@ -56,7 +56,7 @@ Build `ocloc`, a reliable, fast, and testable CLI tool that counts lines of code
   }
   ```
 
-- Provide a language registry (Vec) and a helper to find language by extension or special filename.
+- Provide a language registry loaded from JSON (`assets/languages.json`) and a helper to find language by extension or special filename. Use `include_str!` + `once_cell::sync::Lazy` to parse once at startup and build fast lookup maps.
 - The analyzer should be line-based and maintain a minimal `State` for block comments and string-literal heuristics when needed.
 - Edge cases to test explicitly:
 

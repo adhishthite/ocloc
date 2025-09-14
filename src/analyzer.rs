@@ -16,18 +16,19 @@ pub fn analyze_file(path: &Path) -> Result<FileCounts> {
 
     let mut counts = FileCounts::one_file();
     let mut buf = String::new();
-    let mut in_block: Option<(&'static str, &'static str)> = None;
+    let mut in_block: Option<(String, String)> = None;
 
     // Obtain markers
-    let (line_markers, block_markers) = if let Some(name) = lang {
-        if let Some(lang) = language_registry().iter().find(|l| l.name == name) {
-            (lang.line_markers, lang.block_markers)
+    let (line_markers, block_markers): (Vec<String>, Option<(String, String)>) =
+        if let Some(name) = lang {
+            if let Some(lang) = language_registry().iter().find(|l| l.name == name) {
+                (lang.line_markers.clone(), lang.block_markers.clone())
+            } else {
+                (Vec::new(), None)
+            }
         } else {
-            (&[][..], None)
-        }
-    } else {
-        (&[][..], None)
-    };
+            (Vec::new(), None)
+        };
 
     loop {
         buf.clear();
@@ -49,8 +50,8 @@ pub fn analyze_file(path: &Path) -> Result<FileCounts> {
         let cur = trimmed;
 
         // If already in a block, search for end
-        if let Some((_start, end)) = in_block {
-            if let Some(idx) = cur.find(end) {
+        if let Some((ref _start, ref end)) = in_block {
+            if let Some(idx) = cur.find(end.as_str()) {
                 // block ends on this line; may have code before/after comment
                 let after = &cur[idx + end.len()..];
                 in_block = None;
@@ -65,10 +66,10 @@ pub fn analyze_file(path: &Path) -> Result<FileCounts> {
                 counts.comment += 1;
                 handled_comment = true;
             }
-        } else if let Some((start, end)) = block_markers
-            && let Some(start_idx) = cur.find(start)
+        } else if let Some((ref start, ref end)) = block_markers
+            && let Some(start_idx) = cur.find(start.as_str())
         {
-            if let Some(end_idx) = cur[start_idx + start.len()..].find(end) {
+            if let Some(end_idx) = cur[start_idx + start.len()..].find(end.as_str()) {
                 // start and end on same line
                 let before = &cur[..start_idx];
                 let after = &cur[start_idx + start.len() + end_idx + end.len()..];
@@ -80,7 +81,7 @@ pub fn analyze_file(path: &Path) -> Result<FileCounts> {
                 handled_comment = true;
             } else {
                 // starts block; remains open
-                in_block = Some((start, end));
+                in_block = Some((start.clone(), end.clone()));
                 let before = &cur[..start_idx];
                 if before.trim().is_empty() {
                     counts.comment += 1;
@@ -97,8 +98,8 @@ pub fn analyze_file(path: &Path) -> Result<FileCounts> {
 
         // Line comments
         let mut is_line_comment = false;
-        for m in line_markers {
-            if cur.trim_start().starts_with(m) {
+        for m in &line_markers {
+            if cur.trim_start().starts_with(m.as_str()) {
                 is_line_comment = true;
                 break;
             }

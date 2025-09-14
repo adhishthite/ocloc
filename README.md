@@ -58,6 +58,13 @@ Supported Languages (initial)
 - reStructuredText (`.rst`)
 - AsciiDoc (`.adoc`, `.asciidoc`)
 
+Special filenames recognized
+
+- Build/config: `Dockerfile`, `Makefile`, `CMakeLists.txt`, `BUILD`, `BUILD.bazel`, `WORKSPACE`, `WORKSPACE.bazel`, `MODULE.bazel`, `justfile`
+- Ruby ecosystem: `Gemfile`, `Rakefile`, `Podfile`, `Capfile`, `Vagrantfile`, `Brewfile`
+- Env/config: `.editorconfig`, `.env`, `.envrc`
+- Docs/legal: `README`, `LICENSE`, `COPYING`, `CHANGELOG`, `CHANGES`, `NEWS`
+
 Notes
 
 - Python triple-quoted strings are not parsed as comments; this is a known limitation.
@@ -114,10 +121,11 @@ Progress & Verbose
 
 How to add a new language
 
-- Add an entry to `src/languages.rs` with `name`, `extensions`, `line_markers`, and optional `block_markers`.
-- If the language uses HTML-style comments (e.g., Markdown, SVG, XML), set `block_markers: Some(("<!--", "-->"))`.
+- Edit `assets/languages.json` and add an object with fields: `name`, `extensions`, `line_markers`, and optional `block_markers` (array of two strings) and `special_filenames`.
+- For HTML/XML-like formats (Markdown, SVG, XML), use `"block_markers": ["<!--", "-->"]` and leave `line_markers` empty.
+- For INI-like formats, include both `;` and `#` in `line_markers`.
 - Add or update tests:
-  - Detection: extend `languages.rs` tests to cover new extensions.
-  - Analysis: add a unit test in `analyzer.rs` for comment/blank/code classification.
+  - Detection: extend `src/languages.rs` tests to cover new extensions or filenames.
+  - Analysis: add a unit test in `src/analyzer.rs` for comment/blank/code classification.
 - Run `cargo test`, `cargo fmt`, and `cargo clippy -- -D warnings`.
 - Update the Supported Languages list above if user-facing.

@@ -47,18 +47,17 @@
 
 ## Adding support for a new language
 
-- Update `src/languages.rs`:
-  - Add a `Language` entry with a canonical `name`, `extensions`, `line_markers`, and optional `block_markers`.
-  - For HTML/XML-like formats (Markdown, SVG, XML), use `block_markers: Some(("<!--", "-->"))` and empty `line_markers`.
-  - For INI-like formats, include both `;` and `#` as `line_markers`.
-- Analyzer behavior (`src/analyzer.rs`):
-  - The analyzer is line-based: blank lines are trimmed-empty; pure comment lines increment `comment`; mixed code+comment lines count as `code`.
-  - Block comments spanning multiple lines count each line inside as `comment`; single-line block comments count as one `comment` line.
+- Edit `assets/languages.json`:
+  - Add an object with `name`, `extensions`, `line_markers`, optional `block_markers` (two strings), and optional `special_filenames`.
+  - For HTML/XML-like formats (Markdown, SVG, XML), set `block_markers` to `["<!--", "-->"]` and keep `line_markers` empty.
+  - For INI-like formats, include both `;` and `#` in `line_markers`.
+- Detection and analyzer behavior:
+  - The analyzer is line-based: trimmed-empty lines are `blank`; pure comment lines increment `comment`; mixed code+comment lines count as `code`.
+  - Block comments across multiple lines count each line as `comment`; single-line blocks count as one `comment` line.
 - Tests:
-  - Add/extend unit tests in `src/languages.rs` to validate detection for new extensions (and special filenames if needed).
-  - Add analyzer tests in `src/analyzer.rs` to cover block and line comment behavior for the new language.
+  - Extend unit tests in `src/languages.rs` for detection via new extensions or filenames.
+  - Add analyzer tests in `src/analyzer.rs` for new comment/blank/code rules.
 - Output formats (Table/JSON/CSV):
-  - Aggregation is generic; new languages appear automatically. Optionally add small formatter tests to ensure names render.
+  - Aggregation is generic; new languages appear automatically. Formatter tests can assert names appear.
 - Development hygiene:
-  - Always run `cargo fmt` and `cargo clippy -- -D warnings` before pushing.
-  - Run `cargo test` locally.
+  - Always run `cargo fmt` and `cargo clippy -- -D warnings` before pushing, and `cargo test` locally.
