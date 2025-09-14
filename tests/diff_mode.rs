@@ -1,6 +1,5 @@
 use std::fs;
 use std::io::Write;
-use std::path::PathBuf;
 
 #[test]
 fn diff_mode_reports_added_and_modified() {
