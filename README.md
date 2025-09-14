@@ -58,14 +58,14 @@ Notes
 
 Development
 
-- Format: `cargo fmt -- --check`
+- Format: `cargo fmt` (auto-fixes). Pre-commit hook runs this automatically.
 - Lint: `cargo clippy -- -D warnings`
 - Test: `cargo test`
 
 Git Hooks
 
 - A pre-commit hook script is provided at `scripts/pre-commit`.
-- Install it (symlink) so commits run fmt, clippy, and tests:
+- Install it (symlink) so commits auto-format, lint, and test:
   - `bash scripts/install-git-hooks.sh`
   - or manually:
     - `mkdir -p .git/hooks`

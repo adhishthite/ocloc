@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "[pre-commit] Running cargo fmt -- --check"
-cargo fmt -- --check
+echo "[pre-commit] Auto-formatting Rust code (cargo fmt)"
+# Auto-fix formatting for the whole workspace. If you prefer only staged files,
+# we can enhance this to detect staged paths. For now, keep it simple.
+cargo fmt
 
 echo "[pre-commit] Running cargo clippy -- -D warnings"
 cargo clippy -- -D warnings
@@ -11,4 +13,3 @@ echo "[pre-commit] Running cargo test"
 cargo test --quiet
 
 echo "[pre-commit] All checks passed."
-
