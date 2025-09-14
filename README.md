@@ -18,6 +18,7 @@ Build & Run
 - Follow symlinks: `cargo run -- . --follow-symlinks`
 - Size filters: `cargo run -- . --min-size 1 --max-size 100000`
 - Use custom ignore file: `cargo run -- . --ignore-file tests/fixtures/ignore_repo/.customignore`
+- Skip empty files: `cargo run -- . --skip-empty`
 
 Install Locally
 
@@ -49,6 +50,13 @@ Supported Languages (initial)
 - Dockerfile (`Dockerfile`)
 - YAML (`.yml`, `.yaml`)
 - TOML (`.toml`)
+- Markdown (`.md`, `.mdx`, `.markdown`, `.mdown`, `.mkd`, `.mkdn`)
+- SVG (`.svg`)
+- XML (`.xml`)
+- INI/Config (`.ini`, `.cfg`, `.conf`, `.properties`)
+- Text (`.txt`, `.text`)
+- reStructuredText (`.rst`)
+- AsciiDoc (`.adoc`, `.asciidoc`)
 
 Notes
 
@@ -61,6 +69,7 @@ Development
 - Format: `cargo fmt` (auto-fixes). Pre-commit hook runs this automatically.
 - Lint: `cargo clippy -- -D warnings`
 - Test: `cargo test`
+- Always run: `cargo fmt` and `cargo clippy -D warnings` before pushing
 
 Git Hooks
 
@@ -102,3 +111,13 @@ Progress & Verbose
 
 - Enable progress bar: `--progress` (shows a spinner and counts)
 - Verbose logging: `-v` (repeat up to `-vv` for more detail)
+
+How to add a new language
+
+- Add an entry to `src/languages.rs` with `name`, `extensions`, `line_markers`, and optional `block_markers`.
+- If the language uses HTML-style comments (e.g., Markdown, SVG, XML), set `block_markers: Some(("<!--", "-->"))`.
+- Add or update tests:
+  - Detection: extend `languages.rs` tests to cover new extensions.
+  - Analysis: add a unit test in `analyzer.rs` for comment/blank/code classification.
+- Run `cargo test`, `cargo fmt`, and `cargo clippy -- -D warnings`.
+- Update the Supported Languages list above if user-facing.

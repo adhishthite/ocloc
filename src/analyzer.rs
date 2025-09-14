@@ -175,4 +175,67 @@ mod tests {
         assert_eq!(counts.code, 2);
         assert_eq!(counts.blank, 0);
     }
+
+    #[test]
+    fn markdown_html_comments() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("README.md");
+        let mut f = std::fs::File::create(&path).unwrap();
+        write!(
+            f,
+            "# Title\n\n<!-- intro -->\nSome text paragraph.\n<!-- start\nmultiline\nend -->\n"
+        )
+        .unwrap();
+        let counts = analyze_file(&path).unwrap();
+        // Lines: 7 total
+        assert_eq!(counts.total, 7);
+        // Blank: 1 (second line)
+        assert_eq!(counts.blank, 1);
+        // Comment: 1 (single line block), 3 (multiline start/middle/end)
+        assert_eq!(counts.comment, 4);
+        // Code: title + text
+        assert_eq!(counts.code, 2);
+    }
+
+    #[test]
+    fn ini_line_comments() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("settings.ini");
+        let mut f = std::fs::File::create(&path).unwrap();
+        write!(
+            f,
+            "; leading comment\n# another comment\n\n[section]\nkey=value\nkey2 = value2  # trailing\n"
+        )
+        .unwrap();
+        let counts = analyze_file(&path).unwrap();
+        // total lines: 6
+        assert_eq!(counts.total, 6);
+        // blanks: 1
+        assert_eq!(counts.blank, 1);
+        // comment lines: 2 (leading two). trailing comment is on a code line and not detected as comment-only
+        assert_eq!(counts.comment, 2);
+        // code lines: 3
+        assert_eq!(counts.code, 3);
+    }
+
+    #[test]
+    fn svg_xml_comments() {
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("icon.svg");
+        let mut f = std::fs::File::create(&path).unwrap();
+        write!(
+            f,
+            "<?xml version=\"1.0\"?>\n<!-- single -->\n<svg>\n  <!-- start\n  mid\n  end -->\n</svg>\n"
+        )
+        .unwrap();
+        let counts = analyze_file(&path).unwrap();
+        // total lines: 7 (trailing newline after </svg>)
+        assert_eq!(counts.total, 7);
+        // comments: 1 (single), 3 (multiline)
+        assert_eq!(counts.comment, 4);
+        // blanks: 0
+        assert_eq!(counts.blank, 0);
+        // code: xml decl + <svg> and </svg>
+        assert_eq!(counts.code, 3);
+    }
 }

@@ -97,6 +97,24 @@ pub fn language_registry() -> &'static [Language] {
             block_markers: Some(("/*", "*/")),
         },
         Language {
+            name: "Markdown",
+            extensions: &["md", "markdown", "mdown", "mkd", "mkdn", "mdx"],
+            line_markers: &[],
+            block_markers: Some(("<!--", "-->")),
+        },
+        Language {
+            name: "SVG",
+            extensions: &["svg"],
+            line_markers: &[],
+            block_markers: Some(("<!--", "-->")),
+        },
+        Language {
+            name: "XML",
+            extensions: &["xml"],
+            line_markers: &[],
+            block_markers: Some(("<!--", "-->")),
+        },
+        Language {
             name: "YAML",
             extensions: &["yml", "yaml"],
             line_markers: &["#"],
@@ -106,6 +124,30 @@ pub fn language_registry() -> &'static [Language] {
             name: "TOML",
             extensions: &["toml"],
             line_markers: &["#"],
+            block_markers: None,
+        },
+        Language {
+            name: "INI",
+            extensions: &["ini", "cfg", "conf", "properties"],
+            line_markers: &[";", "#"],
+            block_markers: None,
+        },
+        Language {
+            name: "Text",
+            extensions: &["txt", "text"],
+            line_markers: &[],
+            block_markers: None,
+        },
+        Language {
+            name: "reStructuredText",
+            extensions: &["rst"],
+            line_markers: &[],
+            block_markers: None,
+        },
+        Language {
+            name: "AsciiDoc",
+            extensions: &["adoc", "asciidoc"],
+            line_markers: &["//"],
             block_markers: None,
         },
         Language {
@@ -253,5 +295,34 @@ mod tests {
         }
         assert_eq!(find_language_for_path(&py), Some("Python"));
         assert_eq!(find_language_for_path(&sh), Some("Shell"));
+    }
+
+    #[test]
+    fn detects_doc_and_config_types() {
+        let dir = tempdir().unwrap();
+        let md = dir.path().join("README.md");
+        let mdx = dir.path().join("page.mdx");
+        let svg = dir.path().join("icon.svg");
+        let ini = dir.path().join("settings.ini");
+        let txt = dir.path().join("notes.txt");
+        let rst = dir.path().join("guide.rst");
+        let adoc = dir.path().join("handbook.adoc");
+        let xml = dir.path().join("data.xml");
+        std::fs::File::create(&md).unwrap();
+        std::fs::File::create(&mdx).unwrap();
+        std::fs::File::create(&svg).unwrap();
+        std::fs::File::create(&ini).unwrap();
+        std::fs::File::create(&txt).unwrap();
+        std::fs::File::create(&rst).unwrap();
+        std::fs::File::create(&adoc).unwrap();
+        std::fs::File::create(&xml).unwrap();
+        assert_eq!(find_language_for_path(&md), Some("Markdown"));
+        assert_eq!(find_language_for_path(&mdx), Some("Markdown"));
+        assert_eq!(find_language_for_path(&svg), Some("SVG"));
+        assert_eq!(find_language_for_path(&ini), Some("INI"));
+        assert_eq!(find_language_for_path(&txt), Some("Text"));
+        assert_eq!(find_language_for_path(&rst), Some("reStructuredText"));
+        assert_eq!(find_language_for_path(&adoc), Some("AsciiDoc"));
+        assert_eq!(find_language_for_path(&xml), Some("XML"));
     }
 }

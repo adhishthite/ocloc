@@ -44,3 +44,21 @@
 
 - Align changes with `documentation/PLAN1.md` milestones.
 - Prefer incremental patches; avoid drive-by refactors; keep file layout stable.
+
+## Adding support for a new language
+
+- Update `src/languages.rs`:
+  - Add a `Language` entry with a canonical `name`, `extensions`, `line_markers`, and optional `block_markers`.
+  - For HTML/XML-like formats (Markdown, SVG, XML), use `block_markers: Some(("<!--", "-->"))` and empty `line_markers`.
+  - For INI-like formats, include both `;` and `#` as `line_markers`.
+- Analyzer behavior (`src/analyzer.rs`):
+  - The analyzer is line-based: blank lines are trimmed-empty; pure comment lines increment `comment`; mixed code+comment lines count as `code`.
+  - Block comments spanning multiple lines count each line inside as `comment`; single-line block comments count as one `comment` line.
+- Tests:
+  - Add/extend unit tests in `src/languages.rs` to validate detection for new extensions (and special filenames if needed).
+  - Add analyzer tests in `src/analyzer.rs` to cover block and line comment behavior for the new language.
+- Output formats (Table/JSON/CSV):
+  - Aggregation is generic; new languages appear automatically. Optionally add small formatter tests to ensure names render.
+- Development hygiene:
+  - Always run `cargo fmt` and `cargo clippy -- -D warnings` before pushing.
+  - Run `cargo test` locally.

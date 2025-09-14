@@ -51,6 +51,10 @@ pub struct Args {
     /// Show a progress bar
     #[arg(long = "progress", action = ArgAction::SetTrue)]
     pub progress: bool,
+
+    /// Skip empty files (files with 0 bytes)
+    #[arg(long = "skip-empty", action = ArgAction::SetTrue)]
+    pub skip_empty: bool,
 }
 
 pub fn run() -> Result<()> {

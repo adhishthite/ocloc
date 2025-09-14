@@ -68,7 +68,19 @@ pub fn run_with_args(args: Args) -> Result<()> {
                 return false;
             }
             // file exists & readable basic check
-            fs::metadata(path).is_ok()
+            match fs::metadata(path) {
+                Ok(metadata) => {
+                    // Skip empty files if the flag is set
+                    if args.skip_empty && metadata.len() == 0 {
+                        if args.verbose > 1 {
+                            eprintln!("Skipping empty file: {}", path.display());
+                        }
+                        return false;
+                    }
+                    true
+                }
+                Err(_) => false,
+            }
         })
         .map(|(lang, path)| {
             let counts = analyzer::analyze_file(path).unwrap_or_else(|_| FileCounts::default());
