@@ -16,12 +16,30 @@ impl LineDelta {
         let (base_code, base_comment, base_blank) = base;
         let (head_code, head_comment, head_blank) = head;
         self.files += 1;
-        self.code_added += head_code as isize - base_code as isize;
-        self.comment_added += head_comment as isize - base_comment as isize;
-        self.blank_added += head_blank as isize - base_blank as isize;
+        // Track added vs removed for code
+        if head_code >= base_code {
+            self.code_added += (head_code - base_code) as isize;
+        } else {
+            self.code_removed += (base_code - head_code) as isize;
+        }
+        // Only track additions for comment/blank per plan
+        if head_comment > base_comment {
+            self.comment_added += (head_comment - base_comment) as isize;
+        }
+        if head_blank > base_blank {
+            self.blank_added += (head_blank - base_blank) as isize;
+        }
+        // Net total change across all categories
         self.total_net += (head_code + head_comment + head_blank) as isize
             - (base_code + base_comment + base_blank) as isize;
     }
+}
+
+#[derive(Debug, Clone, Serialize, Default)]
+pub struct GitRefInfo {
+    #[serde(rename = "ref")]
+    pub reference: Option<String>,
+    pub short: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Default)]
@@ -39,6 +57,10 @@ pub struct DiffPerFile {
 pub struct DiffSummary {
     pub base_ref: Option<String>,
     pub head_ref: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub base: Option<GitRefInfo>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub head: Option<GitRefInfo>,
     pub files: usize,
     pub files_added: usize,
     pub files_deleted: usize,

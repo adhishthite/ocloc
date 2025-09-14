@@ -116,6 +116,10 @@ pub struct DiffArgs {
     #[arg(long = "by-file", action = ArgAction::SetTrue)]
     pub by_file: bool,
 
+    /// Summary only: hide per-file details in outputs
+    #[arg(long = "summary-only", action = ArgAction::SetTrue)]
+    pub summary_only: bool,
+
     /// Fail if code added exceeds this threshold
     #[arg(long = "max-code-added")]
     pub max_code_added: Option<usize>,
@@ -123,6 +127,18 @@ pub struct DiffArgs {
     /// Per-language max code thresholds, e.g. --max-code-added-lang Rust:500,Python:100
     #[arg(long = "max-code-added-lang")]
     pub max_code_added_lang: Vec<String>,
+
+    /// Fail if absolute net total changed exceeds this threshold
+    #[arg(long = "max-total-changed")]
+    pub max_total_changed: Option<usize>,
+
+    /// Fail if number of changed files exceeds this threshold
+    #[arg(long = "max-files")]
+    pub max_files: Option<usize>,
+
+    /// Explicitly fail (non-zero exit) when any threshold is exceeded (thresholds otherwise also fail)
+    #[arg(long = "fail-on-threshold", action = ArgAction::SetTrue)]
+    pub fail_on_threshold: bool,
 
     /// Limit by comma-separated extensions (no dots)
     #[arg(long = "ext", value_name = "LIST")]

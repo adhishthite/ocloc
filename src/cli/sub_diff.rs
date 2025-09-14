@@ -6,7 +6,7 @@ use std::path::Path;
 use crate::analyzer;
 use crate::languages::find_language_for_path;
 use crate::types::FileCounts;
-use crate::types_diff::{DiffPerFile, DiffSummary, LineDelta};
+use crate::types_diff::{DiffPerFile, DiffSummary, GitRefInfo, LineDelta};
 use crate::vcs::VcsContext;
 
 use super::DiffArgs;
@@ -33,17 +33,42 @@ pub fn run_diff(args: &DiffArgs) -> Result<()> {
         Mode::Range
     };
 
-    let (changes, base_ref, head_ref) = match mode {
-        Mode::Staged => (
-            vcs.diff_head_to_index()?,
-            Some("HEAD".to_string()),
-            Some("INDEX".to_string()),
-        ),
-        Mode::Worktree => (
-            vcs.diff_index_to_workdir()?,
-            Some("INDEX".to_string()),
-            Some("WORKDIR".to_string()),
-        ),
+    let (changes, base_ref, head_ref, base_info, head_info) = match mode {
+        Mode::Staged => {
+            let head_oid = vcs.head_oid().ok();
+            let base_info = head_oid.map(|o| GitRefInfo {
+                reference: Some(o.to_string()),
+                short: Some(format!("{:.7}", o)),
+            });
+            let head_info = Some(GitRefInfo {
+                reference: Some("INDEX".to_string()),
+                short: Some("INDEX".to_string()),
+            });
+            (
+                vcs.diff_head_to_index()?,
+                Some("HEAD".to_string()),
+                Some("INDEX".to_string()),
+                base_info,
+                head_info,
+            )
+        }
+        Mode::Worktree => {
+            let base_info = Some(GitRefInfo {
+                reference: Some("INDEX".to_string()),
+                short: Some("INDEX".to_string()),
+            });
+            let head_info = Some(GitRefInfo {
+                reference: Some("WORKDIR".to_string()),
+                short: Some("WORKDIR".to_string()),
+            });
+            (
+                vcs.diff_index_to_workdir()?,
+                Some("INDEX".to_string()),
+                Some("WORKDIR".to_string()),
+                base_info,
+                head_info,
+            )
+        }
         Mode::Range => {
             let head_oid = match args.head.as_deref() {
                 Some(h) => vcs.resolve_oid(h)?,
@@ -58,10 +83,20 @@ pub fn run_diff(args: &DiffArgs) -> Result<()> {
                 vcs.resolve_oid("HEAD~1")
                     .context("resolve default base HEAD~1")?
             };
+            let base_info = Some(GitRefInfo {
+                reference: Some(base_oid.to_string()),
+                short: Some(format!("{:.7}", base_oid)),
+            });
+            let head_info = Some(GitRefInfo {
+                reference: Some(head_oid.to_string()),
+                short: Some(format!("{:.7}", head_oid)),
+            });
             (
                 vcs.diff_between(base_oid, head_oid)?,
                 args.base.clone(),
                 args.head.clone().or_else(|| Some("HEAD".to_string())),
+                base_info,
+                head_info,
             )
         }
     };
@@ -171,6 +206,7 @@ pub fn run_diff(args: &DiffArgs) -> Result<()> {
     for (_lang, d) in per_lang.iter() {
         totals.files += d.files;
         totals.code_added += d.code_added;
+        totals.code_removed += d.code_removed;
         totals.comment_added += d.comment_added;
         totals.blank_added += d.blank_added;
         totals.total_net += d.total_net;
@@ -179,25 +215,47 @@ pub fn run_diff(args: &DiffArgs) -> Result<()> {
     let summary = DiffSummary {
         base_ref,
         head_ref,
+        base: base_info,
+        head: head_info,
         files: per_file.len(),
         files_added: per_file.iter().filter(|f| f.status == "A").count(),
         files_deleted: per_file.iter().filter(|f| f.status == "D").count(),
         files_modified: per_file.iter().filter(|f| f.status == "M").count(),
         files_renamed: per_file.iter().filter(|f| f.status == "R").count(),
         languages: per_lang,
-        by_file: if args.by_file { per_file } else { Vec::new() },
+        by_file: if args.by_file && !args.summary_only {
+            per_file
+        } else {
+            Vec::new()
+        },
         totals,
     };
 
     // Threshold gating (global + per-language) with output emission
+    // Threshold checks: only fail with non-zero exit if explicitly requested
+    let mut threshold_errors: Vec<String> = Vec::new();
     if let Some(max) = args.max_code_added {
         if summary.totals.code_added > max as isize {
-            emit_output(args, &summary);
-            bail!(
+            threshold_errors.push(format!(
                 "code delta {} exceeds threshold {}",
-                summary.totals.code_added,
-                max
-            );
+                summary.totals.code_added, max
+            ));
+        }
+    }
+    if let Some(max) = args.max_total_changed {
+        if summary.totals.total_net.unsigned_abs() > max {
+            threshold_errors.push(format!(
+                "total net delta {} exceeds threshold {}",
+                summary.totals.total_net, max
+            ));
+        }
+    }
+    if let Some(max) = args.max_files {
+        if summary.files > max {
+            threshold_errors.push(format!(
+                "files changed {} exceeds threshold {}",
+                summary.files, max
+            ));
         }
     }
     if !args.max_code_added_lang.is_empty() {
@@ -218,14 +276,22 @@ pub fn run_diff(args: &DiffArgs) -> Result<()> {
             }
         }
         if !violations.is_empty() {
-            emit_output(args, &summary);
-            bail!(
+            threshold_errors.push(format!(
                 "per-language thresholds exceeded: {}",
                 violations.join(", ")
-            );
+            ));
         }
     }
 
+    if !threshold_errors.is_empty() {
+        emit_output(args, &summary);
+        if args.fail_on_threshold {
+            bail!(threshold_errors.join("; "));
+        } else {
+            eprintln!("Warning: {}", threshold_errors.join("; "));
+            return Ok(());
+        }
+    }
     emit_output(args, &summary);
     Ok(())
 }
@@ -268,21 +334,45 @@ fn print_table(s: &DiffSummary) {
 }
 
 fn print_csv(s: &DiffSummary) {
-    println!("language,files,code_delta,comment_delta,blank_delta,net_delta");
+    println!("language,files,code_added,code_removed,comment_added,blank_added,net_delta");
     for (lang, d) in &s.languages {
         println!(
-            "{},{},{},{},{},{}",
-            lang, d.files, d.code_added, d.comment_added, d.blank_added, d.total_net
+            "{},{},{},{},{},{},{}",
+            lang,
+            d.files,
+            d.code_added,
+            d.code_removed,
+            d.comment_added,
+            d.blank_added,
+            d.total_net
         );
     }
     println!(
-        "Total,{},{},{},{},{}",
+        "Total,{},{},{},{},{},{}",
         s.totals.files,
         s.totals.code_added,
+        s.totals.code_removed,
         s.totals.comment_added,
         s.totals.blank_added,
         s.totals.total_net
     );
+
+    if !s.by_file.is_empty() {
+        println!();
+        println!("path,status,language,code_delta,comment_delta,blank_delta,net_delta");
+        for f in &s.by_file {
+            println!(
+                "{},{},{},{},{},{},{}",
+                f.path,
+                f.status,
+                f.language,
+                f.code_delta,
+                f.comment_delta,
+                f.blank_delta,
+                f.total_delta
+            );
+        }
+    }
 }
 
 fn print_markdown(s: &DiffSummary) {

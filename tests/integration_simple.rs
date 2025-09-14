@@ -20,3 +20,19 @@ fn runs_on_simple_fixture() {
     assert!(stdout.contains("Rust"));
     assert!(stdout.contains("Python"));
 }
+
+#[test]
+fn analyze_reader_parity_with_analyze_file() {
+    use std::io::Cursor;
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("parity.rs");
+    std::fs::write(&path, "// c1\nfn main() {}\n/* x */\n").unwrap();
+
+    let file_counts = ocloc::analyzer::analyze_file(&path).unwrap();
+    let data = std::fs::read(&path).unwrap();
+    let reader_counts = ocloc::analyzer::analyze_reader(Cursor::new(data), &path).unwrap();
+    assert_eq!(file_counts.total, reader_counts.total);
+    assert_eq!(file_counts.code, reader_counts.code);
+    assert_eq!(file_counts.comment, reader_counts.comment);
+    assert_eq!(file_counts.blank, reader_counts.blank);
+}

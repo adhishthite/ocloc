@@ -9,7 +9,7 @@
 - **⚡ Blazing Fast**: 6-23x faster than cloc on real-world codebases
 - **📊 Beautiful Reports**: Professional output with file statistics, performance metrics, and formatted tables
 - **🎯 Accurate Detection**: Recognizes 50+ languages by extension, filename, and shebang
-- **🔧 Flexible Output**: Table (with colors!), JSON, or CSV formats
+- **🔧 Flexible Output**: Table, JSON, or CSV formats
 - **🚶 Respects .gitignore**: Automatically follows your repository's ignore rules
 - **⚙️ Parallel Processing**: Leverages all CPU cores for maximum performance
 - **📈 Real-time Progress**: Optional progress bar for large repositories
@@ -58,7 +58,7 @@ Real-world benchmarks on popular repositories:
 | Small (elasticgpt-agents) | 302   | 53K   | 0.45s     | 0.07s      | **6.4x faster**  |
 | Large (elasticsearch)     | 31K   | 5.5M  | 56s       | 2.35s      | **23.8x faster** |
 
-### 🚀 ocloc processes over **2.3 million lines per second** on modern hardware!
+### 🚀 ocloc processes over **2.3 million lines per second** on modern hardware
 
 Think about that for a moment - ocloc can analyze:
 
@@ -83,6 +83,21 @@ cargo install --path .
 cargo run --release -- /path/to/analyze
 ```
 
+### Homebrew (macOS)
+
+Prebuilt binaries are currently published for macOS only (Apple Silicon and Intel).
+
+```bash
+# Add the tap (one-time)
+brew tap adhishthite/ocloc
+
+# Install
+brew install ocloc
+
+# Alternatively without tapping explicitly
+# brew install adhishthite/ocloc/ocloc
+```
+
 ### Release & Distribute (maintainers)
 
 To publish a new release to crates.io:
@@ -92,15 +107,15 @@ To publish a new release to crates.io:
 3. Tag and push a release: `git tag v0.1.0 && git push origin v0.1.0`.
 4. Publish: `cargo publish` (use `cargo publish --dry-run` first).
 
-GitHub Releases are created automatically when pushing a `v*.*.*` tag. The workflow builds and attaches versioned artifacts:
+GitHub Releases are created automatically when pushing a `v*.*.*` tag. The workflow currently builds macOS artifacts only and attaches:
 
-- `ocloc-<version>-<target>.tar.gz` (Linux/macOS)
-- `ocloc-<version>-<target>.zip` (Windows)
-- `SHA256SUMS.txt` (checksums for all artifacts)
+- `ocloc-<version>-aarch64-apple-darwin.tar.gz`
+- `ocloc-<version>-x86_64-apple-darwin.tar.gz`
+- `SHA256SUMS.txt` (checksums)
 
-Example targets: `x86_64-unknown-linux-gnu`, `aarch64-apple-darwin`, `x86_64-pc-windows-msvc`.
+Linux and Windows users can build from source for now.
 
-Homebrew tap updates can be automated if you set secrets `TAP_REPO` and `TAP_TOKEN`. The formula will be updated to the latest tag with the correct tarball and SHA256.
+Homebrew tap updates can be automated if you set secrets `TAP_REPO` and `TAP_TOKEN`. The formula will be updated to the latest tag with the correct macOS tarballs and SHA256.
 
 ### Version bump helper
 
@@ -114,7 +129,7 @@ make release-all
 
 ### Prerequisites
 
-- Rust toolchain (stable)
+- Rust toolchain (stable, Rust >= 1.85)
 - Cargo
 
 ## 📖 Usage
@@ -284,15 +299,23 @@ ocloc diff --merge-base origin/main
 # Machine-readable output
 ocloc diff --base HEAD~1 --head HEAD --json > loc_diff.json
 ocloc diff --base HEAD~1 --head HEAD --markdown > loc_diff.md
+ocloc diff --base HEAD~1 --head HEAD --csv > loc_diff.csv   # includes code_added/code_removed
 
 # Include per-file rows in JSON/CSV/Markdown and richer Markdown summary
 ocloc diff --base HEAD~1 --head HEAD --json --by-file
+ocloc diff --base HEAD~1 --head HEAD --csv --by-file > per_file.csv
 ocloc diff --base HEAD~1 --head HEAD --markdown --by-file > summary.md
 
-# Gate on thresholds (non-zero exit when exceeded)
-ocloc diff --base HEAD~1 --head HEAD --max-code-added 2500
+# Summary-only (hide per-file details)
+ocloc diff --base HEAD~1 --head HEAD --json --summary-only
+
+# Gate on thresholds (add --fail-on-threshold to exit non-zero)
+ocloc diff --base HEAD~1 --head HEAD --max-code-added 2500 --fail-on-threshold
 # Per-language thresholds (repeatable): LANG:N pairs
-ocloc diff --base HEAD~1 --head HEAD --max-code-added-lang Rust:800 --max-code-added-lang Python:200
+ocloc diff --base HEAD~1 --head HEAD --max-code-added-lang Rust:800 --max-code-added-lang Python:200 --fail-on-threshold
+# Additional thresholds
+ocloc diff --base HEAD~1 --head HEAD --max-total-changed 5000 --fail-on-threshold
+ocloc diff --base HEAD~1 --head HEAD --max-files 100 --fail-on-threshold
 ```
 
 Makefile helpers:
@@ -334,9 +357,12 @@ GitHub Actions snippet:
 ```
 
 Local tips:
+
 - `ocloc diff --staged` compares your staged changes to HEAD.
 - `ocloc diff --working-tree` compares unstaged working changes to the index.
 - Use `--ext` to limit analysis to specific languages (e.g., `--ext rs,py`).
+- Rename detection is enabled; renamed files are counted with status `R`.
+ - JSON includes `base`/`head` refs with short SHAs, plus legacy `base_ref`/`head_ref` strings.
 
 ### Manual Build Commands
 

@@ -15,6 +15,7 @@
 - Diff tests: `cargo test --tests diff_` to run diff-mode tests only.
 - Lint/format: `cargo fmt -- --check` and `cargo clippy -- -D warnings`.
 - Install locally: `cargo install --path .`.
+- Toolchain: Rust stable ≥ 1.85 (see `rust-version` in Cargo.toml).
 
 ## Coding Style & Naming Conventions
 
@@ -52,10 +53,20 @@
   - Range: `--base <rev>`, `--head <rev>`, or `--merge-base <rev>`
   - Index/working: `--staged` (HEAD vs index), `--working-tree` (index vs worktree)
   - Output: `--json`, `--csv`, `--markdown`, `--by-file`
-  - Thresholds: `--max-code-added <N>` (non-zero exit on exceed)
+  - Thresholds: `--max-code-added <N>`, `--max-total-changed <N>`, `--max-files <N>`
+  - Use `--fail-on-threshold` to return non-zero on any violation
+  - Use `--summary-only` to hide per-file details
+  - Per-language thresholds: repeatable `--max-code-added-lang LANG:N`
+- Rename detection is enabled in diff mode; renamed files are reported as status `R`.
 - Make targets: `make diff`, `make diff-json`, `make diff-md` with `BASE`/`HEAD` overrides.
 - Tests live in `tests/diff_*.rs` and create ephemeral git repos; keep them deterministic.
 - Prefer incremental patches; avoid drive-by refactors; keep file layout stable.
+
+### CI/Release Notes
+
+- CI builds release binaries and runs fmt/clippy/tests.
+- Release workflow currently publishes macOS tarballs (`aarch64-apple-darwin`, `x86_64-apple-darwin`) and updates a Homebrew tap when configured.
+- Linux/Windows users can build from source until cross-platform artifacts are added.
 
 ## Adding support for a new language
 
