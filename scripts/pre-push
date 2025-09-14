@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+echo "[pre-push] Building release (cargo build --release)"
+cargo build --release
+
+echo "[pre-push] Running full test suite (cargo test)"
+cargo test
+
+echo "[pre-push] OK — push allowed."
+
