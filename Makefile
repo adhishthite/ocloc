@@ -5,6 +5,7 @@
 BINARY_NAME = ocloc
 CARGO = cargo
 INSTALL_PATH = ~/.cargo/bin
+VERSION := $(shell sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -n1)
 BASE ?= HEAD~1
 HEAD ?= HEAD
 
@@ -49,6 +50,41 @@ release:
 	@$(CARGO) build --release
 	@echo "$(GREEN)✓ Release build complete$(NC)"
 	@echo "Binary location: target/release/$(BINARY_NAME)"
+
+## tag-release: Tag repository with Cargo.toml version and push (v$(VERSION))
+.PHONY: tag-release
+tag-release:
+	@echo "$(YELLOW)Tagging release v$(VERSION)...$(NC)"
+	@if [ -n "$(shell git status --porcelain)" ]; then \
+		echo "$(RED)Working tree not clean. Commit or stash changes before tagging.$(NC)"; \
+		exit 1; \
+	fi
+	@if git rev-parse "v$(VERSION)" >/dev/null 2>&1; then \
+		echo "$(RED)Tag v$(VERSION) already exists.$(NC)"; \
+		exit 1; \
+	fi
+	@git tag -a v$(VERSION) -m "ocloc $(VERSION)"
+	@git push origin v$(VERSION)
+	@echo "$(GREEN)✓ Tagged and pushed v$(VERSION)$(NC)"
+
+## release-all: Check, build, and tag current version
+.PHONY: release-all
+release-all: check release tag-release
+	@echo "$(GREEN)✓ Release workflow complete for v$(VERSION)$(NC)"
+
+## publish-crates-dry: Dry-run publish to crates.io
+.PHONY: publish-crates-dry
+publish-crates-dry:
+	@echo "$(YELLOW)Running cargo publish --dry-run for v$(VERSION)...$(NC)"
+	@cargo publish --dry-run
+	@echo "$(GREEN)✓ Dry-run publish OK$(NC)"
+
+## publish-crates: Publish to crates.io (requires cargo login)
+.PHONY: publish-crates
+publish-crates:
+	@echo "$(YELLOW)Publishing to crates.io for v$(VERSION)...$(NC)"
+	@cargo publish
+	@echo "$(GREEN)✓ Published to crates.io$(NC)"
 
 ## install: Install ocloc to system (~/.cargo/bin)
 .PHONY: install
@@ -254,6 +290,11 @@ version:
 	@echo ""
 	@echo "$(YELLOW)Cargo version:$(NC)"
 	@$(CARGO) --version
+
+## version-show: Print version from Cargo.toml only
+.PHONY: version-show
+version-show:
+	@echo "$(GREEN)Version: $(VERSION)$(NC)"
 
 ## update: Update dependencies
 .PHONY: update

@@ -83,7 +83,7 @@ cargo install --path .
 cargo run --release -- /path/to/analyze
 ```
 
-### Publish to crates.io (maintainers)
+### Release & Distribute (maintainers)
 
 To publish a new release to crates.io:
 
@@ -92,7 +92,25 @@ To publish a new release to crates.io:
 3. Tag and push a release: `git tag v0.1.0 && git push origin v0.1.0`.
 4. Publish: `cargo publish` (use `cargo publish --dry-run` first).
 
-GitHub Releases are created automatically when pushing a `v*.*.*` tag. The built Linux binary (`target/release/ocloc`) is attached to the Release.
+GitHub Releases are created automatically when pushing a `v*.*.*` tag. The workflow builds and attaches versioned artifacts:
+
+- `ocloc-<version>-<target>.tar.gz` (Linux/macOS)
+- `ocloc-<version>-<target>.zip` (Windows)
+- `SHA256SUMS.txt` (checksums for all artifacts)
+
+Example targets: `x86_64-unknown-linux-gnu`, `aarch64-apple-darwin`, `x86_64-pc-windows-msvc`.
+
+Homebrew tap updates can be automated if you set secrets `TAP_REPO` and `TAP_TOKEN`. The formula will be updated to the latest tag with the correct tarball and SHA256.
+
+### Version bump helper
+
+Use the Make target to bump versions across Cargo.toml and CHANGELOG.md:
+
+```bash
+make bump VERSION=0.1.1
+# Review the changes, commit, and run:
+make release-all
+```
 
 ### Prerequisites
 
@@ -225,6 +243,11 @@ make fmt            # Format code
 make lint           # Run clippy linter
 make clean          # Remove build artifacts
 make compare        # Compare performance with cloc
+make version-show   # Print version from Cargo.toml
+make release-all    # Run check, build release, tag and push
+make tag-release    # Tag current version and push
+make publish-crates-dry  # Dry run crates.io publish
+make publish-crates      # Publish to crates.io (requires cargo login)
 ```
 
 ## 🧪 Benchmarking
