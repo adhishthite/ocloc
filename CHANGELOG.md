@@ -8,17 +8,18 @@ The format is based on Keep a Changelog and adheres to Semantic Versioning.
 
 ## [0.3.1] - 2025-09-15
 
-## [0.3.1] - 2025-09-15
-
 ### Fixed
+
 - Include updated Cargo.lock in the repository to support `--locked` builds in CI.
 
 ### Added
+
 - Diff CSV per-file output when `--by-file` is set.
 - New flags: `--summary-only`, `--max-total-changed`, `--max-files`, `--fail-on-threshold`.
 - JSON now includes `base`/`head` refs with short SHAs; totals include `code_removed`.
 
 ### Docs
+
 - README and AGENTS updated for new flags, CSV format, and macOS release notes.
 
 ## [0.2.1] - 2025-09-15
