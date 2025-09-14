@@ -100,7 +100,7 @@ jobs:
     name: Update Homebrew Tap
     needs: release
     runs-on: ubuntu-latest
-    if: ${{ secrets.TAP_REPO != '' && secrets.TAP_TOKEN != '' }}
+    if: ${{ secrets.TAP_REPO && secrets.TAP_TOKEN }}
     steps:
       - name: Checkout tap repo
         run: |
@@ -132,7 +132,7 @@ jobs:
           VERSION="${TAG#v}"
           FORMULA_DIR="tap/Formula"
           mkdir -p "$FORMULA_DIR"
-          cat > "$FORMULA_DIR/ocloc.rb" <<'RUBY'
+          cat > "$FORMULA_DIR/ocloc.rb" <<'EOF'
 class Ocloc < Formula
   desc "Fast, reliable lines-of-code counter"
   homepage "https://github.com/$REPO_SLUG"
@@ -163,7 +163,7 @@ class Ocloc < Formula
     system "#{bin}/ocloc", "--version"
   end
 end
-RUBY
+EOF
           cd tap
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
