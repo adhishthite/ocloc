@@ -234,6 +234,76 @@ Notes:
 - They build `ocloc` in release mode if not already built.
 - Output includes timing and totals in a compact table, plus a speedup when cloc is available.
 
+## 🔀 Diff Mode (CI-friendly)
+
+Analyze what changed between two Git refs and aggregate LOC deltas by language. Useful for PRs and CI gates.
+
+Basic usage:
+
+```bash
+# Compare HEAD~1..HEAD
+ocloc diff --base HEAD~1 --head HEAD
+
+# Use merge-base with a branch
+ocloc diff --merge-base origin/main
+
+# Machine-readable output
+ocloc diff --base HEAD~1 --head HEAD --json > loc_diff.json
+ocloc diff --base HEAD~1 --head HEAD --markdown > loc_diff.md
+
+# Include per-file rows in JSON/CSV/Markdown and richer Markdown summary
+ocloc diff --base HEAD~1 --head HEAD --json --by-file
+ocloc diff --base HEAD~1 --head HEAD --markdown --by-file > summary.md
+
+# Gate on thresholds (non-zero exit when exceeded)
+ocloc diff --base HEAD~1 --head HEAD --max-code-added 2500
+# Per-language thresholds (repeatable): LANG:N pairs
+ocloc diff --base HEAD~1 --head HEAD --max-code-added-lang Rust:800 --max-code-added-lang Python:200
+```
+
+Makefile helpers:
+
+```bash
+# Defaults to BASE=HEAD~1 and HEAD=HEAD
+make diff
+make diff-json    # writes loc_diff.json
+make diff-md      # writes loc_diff.md
+
+# Override base/head
+make diff BASE=origin/main HEAD=HEAD
+```
+
+GitHub Actions snippet:
+
+```yaml
+- uses: actions/checkout@v4
+  with:
+    fetch-depth: 0
+- name: Build
+  run: cargo build --release --locked
+- name: LOC diff
+  run: |
+    BASE="${{ github.event.pull_request.base.sha || github.event.before }}"
+    HEAD="${{ github.sha }}"
+    ./target/release/ocloc diff --base "$BASE" --head "$HEAD" --json > loc_diff.json
+    ./target/release/ocloc diff --base "$BASE" --head "$HEAD" --markdown > loc_diff.md
+    if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+      cat loc_diff.md >> "$GITHUB_STEP_SUMMARY"
+    fi
+- name: Gate on LOC increase
+  run: |
+    CODE_ADDED=$(jq '.totals.code_added' loc_diff.json)
+    if [ "$CODE_ADDED" -gt 2500 ]; then
+      echo "Too many code lines added: $CODE_ADDED" >&2
+      exit 1
+    fi
+```
+
+Local tips:
+- `ocloc diff --staged` compares your staged changes to HEAD.
+- `ocloc diff --working-tree` compares unstaged working changes to the index.
+- Use `--ext` to limit analysis to specific languages (e.g., `--ext rs,py`).
+
 ### Manual Build Commands
 
 ```bash

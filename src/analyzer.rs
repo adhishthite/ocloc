@@ -9,10 +9,13 @@ use crate::types::FileCounts;
 
 pub fn analyze_file(path: &Path) -> Result<FileCounts> {
     let file = File::open(path).with_context(|| format!("open file: {}", path.display()))?;
-    let mut reader = BufReader::new(file);
+    let reader = BufReader::new(file);
+    analyze_reader(reader, path)
+}
 
+pub fn analyze_reader<R: BufRead>(mut reader: R, path_hint: &Path) -> Result<FileCounts> {
     // Locate language by extension; unknown -> skip counts but still produce 0s
-    let lang = super::languages::find_language_for_path(path);
+    let lang = super::languages::find_language_for_path(path_hint);
 
     let mut counts = FileCounts::one_file();
     let mut buf = String::new();

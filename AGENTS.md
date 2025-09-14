@@ -12,6 +12,7 @@
 - Build: `cargo build` (debug) or `cargo build --release`.
 - Run: `cargo run -- .` to analyze the current directory. Example JSON: `cargo run --release -- . --json > out.json`.
 - Test: `cargo test` (all), `cargo test --lib` (unit only).
+- Diff tests: `cargo test --tests diff_` to run diff-mode tests only.
 - Lint/format: `cargo fmt -- --check` and `cargo clippy -- -D warnings`.
 - Install locally: `cargo install --path .`.
 
@@ -43,6 +44,17 @@
 ## Agent-Specific Notes
 
 - Align changes with `documentation/PLAN1.md` milestones.
+- Diff mode plan/spec is in `documentation/PLAN2.md`; follow it for changes under `src/cli/sub_diff.rs`, `src/vcs.rs`, and `src/types_diff.rs`.
+
+## Diff Mode & CI
+
+- Subcommand `ocloc diff` supports:
+  - Range: `--base <rev>`, `--head <rev>`, or `--merge-base <rev>`
+  - Index/working: `--staged` (HEAD vs index), `--working-tree` (index vs worktree)
+  - Output: `--json`, `--csv`, `--markdown`, `--by-file`
+  - Thresholds: `--max-code-added <N>` (non-zero exit on exceed)
+- Make targets: `make diff`, `make diff-json`, `make diff-md` with `BASE`/`HEAD` overrides.
+- Tests live in `tests/diff_*.rs` and create ephemeral git repos; keep them deterministic.
 - Prefer incremental patches; avoid drive-by refactors; keep file layout stable.
 
 ## Adding support for a new language

@@ -5,6 +5,8 @@
 BINARY_NAME = ocloc
 CARGO = cargo
 INSTALL_PATH = ~/.cargo/bin
+BASE ?= HEAD~1
+HEAD ?= HEAD
 
 # Color codes for pretty output
 RED = \033[0;31m
@@ -104,6 +106,26 @@ bench-small: release
 bench-large: release
 	@echo "$(YELLOW)Benchmarking on elasticsearch...$(NC)"
 	@bash scripts/benchmark-large.sh
+
+## diff: Show LOC deltas between two git refs (BASE..HEAD)
+.PHONY: diff
+diff: release
+	@echo "$(YELLOW)Diffing $(BASE)..$(HEAD) ...$(NC)"
+	@./target/release/$(BINARY_NAME) diff --base "$(BASE)" --head "$(HEAD)"
+
+## diff-json: Write LOC deltas to loc_diff.json
+.PHONY: diff-json
+diff-json: release
+	@echo "$(YELLOW)Diffing $(BASE)..$(HEAD) (JSON) ...$(NC)"
+	@./target/release/$(BINARY_NAME) diff --base "$(BASE)" --head "$(HEAD)" --json > loc_diff.json
+	@echo "$(GREEN)✓ Wrote loc_diff.json$(NC)"
+
+## diff-md: Write LOC deltas to loc_diff.md (Markdown)
+.PHONY: diff-md
+diff-md: release
+	@echo "$(YELLOW)Diffing $(BASE)..$(HEAD) (Markdown) ...$(NC)"
+	@./target/release/$(BINARY_NAME) diff --base "$(BASE)" --head "$(HEAD)" --markdown > loc_diff.md
+	@echo "$(GREEN)✓ Wrote loc_diff.md$(NC)"
 
 ## fmt: Format code using rustfmt
 .PHONY: fmt

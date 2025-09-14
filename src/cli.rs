@@ -4,10 +4,15 @@ use anyhow::Result;
 use clap::{ArgAction, Parser, ValueHint};
 
 mod run_impl;
+mod sub_diff;
 
 #[derive(Parser, Debug, Clone)]
 #[command(name = "ocloc", version, about = "Fast, reliable lines-of-code counter", long_about = None)]
 pub struct Args {
+    /// Subcommand (use without subcommand for regular analysis)
+    #[command(subcommand)]
+    pub cmd: Option<Subcommand>,
+
     /// Path to scan (directory or file)
     #[arg(value_name = "PATH", default_value = ".", value_hint = ValueHint::AnyPath)]
     pub path: PathBuf,
@@ -59,5 +64,67 @@ pub struct Args {
 
 pub fn run() -> Result<()> {
     let args = Args::parse();
+    if let Some(cmd) = &args.cmd {
+        match cmd {
+            Subcommand::Diff(diff_args) => return sub_diff::run_diff(diff_args),
+        }
+    }
     run_impl::run_with_args(args)
+}
+
+#[derive(clap::Subcommand, Debug, Clone)]
+pub enum Subcommand {
+    /// Show LOC deltas between two git refs or working tree
+    Diff(DiffArgs),
+}
+
+#[derive(clap::Args, Debug, Clone)]
+pub struct DiffArgs {
+    /// Base git rev (commit, tag, or ref)
+    #[arg(long)]
+    pub base: Option<String>,
+
+    /// Head git rev (defaults to HEAD)
+    #[arg(long)]
+    pub head: Option<String>,
+
+    /// Use merge-base between HEAD and this ref as base
+    #[arg(long = "merge-base")]
+    pub merge_base: Option<String>,
+
+    /// Compare HEAD vs index (staged changes)
+    #[arg(long = "staged", action = ArgAction::SetTrue)]
+    pub staged: bool,
+
+    /// Compare index vs working tree (unstaged changes)
+    #[arg(long = "working-tree", action = ArgAction::SetTrue)]
+    pub working_tree: bool,
+
+    /// Output JSON
+    #[arg(long = "json", action = ArgAction::SetTrue, conflicts_with = "csv")]
+    pub json: bool,
+
+    /// Output CSV
+    #[arg(long = "csv", action = ArgAction::SetTrue, conflicts_with = "json")]
+    pub csv: bool,
+
+    /// Output Markdown
+    #[arg(long = "markdown", action = ArgAction::SetTrue)]
+    pub markdown: bool,
+
+    /// Include per-file detail
+    #[arg(long = "by-file", action = ArgAction::SetTrue)]
+    pub by_file: bool,
+
+    /// Fail if code added exceeds this threshold
+    #[arg(long = "max-code-added")]
+    pub max_code_added: Option<usize>,
+
+    /// Per-language max code thresholds, e.g. --max-code-added-lang Rust:500,Python:100
+    #[arg(long = "max-code-added-lang")]
+    pub max_code_added_lang: Vec<String>,
+
+    /// Limit by comma-separated extensions (no dots)
+    #[arg(long = "ext", value_name = "LIST")]
+    pub extensions: Option<String>,
 }
