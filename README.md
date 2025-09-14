@@ -73,7 +73,7 @@ Notes:
 
 ## 🚀 Installation
 
-### From Source
+### From Source (GitHub)
 
 ```bash
 # Build and install
@@ -82,6 +82,17 @@ cargo install --path .
 # Or run directly
 cargo run --release -- /path/to/analyze
 ```
+
+### Publish to crates.io (maintainers)
+
+To publish a new release to crates.io:
+
+1. Ensure `Cargo.toml` metadata (description, license, repository, keywords, categories) is accurate.
+2. Log in locally: `cargo login` and enter your crates.io API token.
+3. Tag and push a release: `git tag v0.1.0 && git push origin v0.1.0`.
+4. Publish: `cargo publish` (use `cargo publish --dry-run` first).
+
+GitHub Releases are created automatically when pushing a `v*.*.*` tag. The built Linux binary (`target/release/ocloc`) is attached to the Release.
 
 ### Prerequisites
 

@@ -1,0 +1,73 @@
+name: Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Cache cargo
+        uses: swatinem/rust-cache@v2
+      - name: Build release
+        run: cargo build --release --locked
+      - name: Prepare artifact (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          cp target/release/ocloc ocloc-linux
+          echo "Built: $(./ocloc-linux --version || true)"
+      - name: Prepare artifact (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          cp target/release/ocloc ocloc-macos
+          echo "Built: $(./ocloc-macos --version || true)"
+      - name: Prepare artifact (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          cp target/release/ocloc.exe ocloc-windows.exe
+          echo "Windows binary prepared"
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocloc-${{ runner.os }}
+          path: |
+            ocloc-linux
+            ocloc-macos
+            ocloc-windows.exe
+
+  release:
+    name: Create Release and Attach Assets
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: List artifacts
+        run: ls -l dist
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: false
+          prerelease: false
+          files: |
+            dist/ocloc-linux
+            dist/ocloc-macos
+            dist/ocloc-windows.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

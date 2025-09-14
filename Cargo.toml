@@ -7,6 +7,10 @@ license = "MIT"
 repository = "https://github.com/adhishthite/ocloc"
 readme = "README.md"
 rust-version = "1.85"
+homepage = "https://github.com/adhishthite/ocloc"
+documentation = "https://docs.rs/ocloc"
+keywords = ["cloc", "loc", "code", "metrics", "cli"]
+categories = ["command-line-utilities", "development-tools"]
 
 [dependencies]
 anyhow = "1.0"
