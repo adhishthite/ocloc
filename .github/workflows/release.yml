@@ -100,12 +100,12 @@ jobs:
     name: Update Homebrew Tap
     needs: release
     runs-on: ubuntu-latest
-    if: ${{ secrets.TAP_REPO && secrets.TAP_TOKEN }}
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     steps:
       - name: Checkout tap repo
         run: |
           set -e
-          git clone https://x-access-token:${{ secrets.TAP_TOKEN }}@github.com/${{ secrets.TAP_REPO }} tap
+          git clone https://x-access-token:${{ secrets.TAP_TOKEN }}@github.com/${{ vars.TAP_REPO || 'adhishthite/homebrew-ocloc' }} tap
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
@@ -132,38 +132,38 @@ jobs:
           VERSION="${TAG#v}"
           FORMULA_DIR="tap/Formula"
           mkdir -p "$FORMULA_DIR"
-          cat > "$FORMULA_DIR/ocloc.rb" <<-FORMULA
-          class Ocloc < Formula
-            desc "Fast, reliable lines-of-code counter"
-            homepage "https://github.com/${REPO_SLUG}"
-            version "${VERSION}"
-            license "MIT"
-
-            on_macos do
-              if Hardware::CPU.arm?
-                url "https://github.com/${REPO_SLUG}/releases/download/${TAG}/${MAC_ARM_TARBALL}"
-                sha256 "${MAC_ARM_SHA}"
-              else
-                url "https://github.com/${REPO_SLUG}/releases/download/${TAG}/${MAC_X64_TARBALL}"
-                sha256 "${MAC_X64_SHA}"
-              end
-            end
-
-            on_linux do
-              url "https://github.com/${REPO_SLUG}/releases/download/${TAG}/${LINUX_X64_TARBALL}"
-              sha256 "${LINUX_X64_SHA}"
-            end
-
-            def install
-              system "tar", "-xzf", Dir["*.tar.gz"].first if Dir["*.tar.gz"].any?
-              bin.install "ocloc" => "ocloc"
-            end
-
-            test do
-              system "#{bin}/ocloc", "--version"
-            end
-          end
-          FORMULA
+          {
+            echo 'class Ocloc < Formula'
+            echo '  desc "Fast, reliable lines-of-code counter"'
+            echo "  homepage \"https://github.com/${REPO_SLUG}\""
+            echo "  version \"${VERSION}\""
+            echo '  license "MIT"'
+            echo ''
+            echo '  on_macos do'
+            echo '    if Hardware::CPU.arm?'
+            echo "      url \"https://github.com/${REPO_SLUG}/releases/download/${TAG}/${MAC_ARM_TARBALL}\""
+            echo "      sha256 \"${MAC_ARM_SHA}\""
+            echo '    else'
+            echo "      url \"https://github.com/${REPO_SLUG}/releases/download/${TAG}/${MAC_X64_TARBALL}\""
+            echo "      sha256 \"${MAC_X64_SHA}\""
+            echo '    end'
+            echo '  end'
+            echo ''
+            echo '  on_linux do'
+            echo "    url \"https://github.com/${REPO_SLUG}/releases/download/${TAG}/${LINUX_X64_TARBALL}\""
+            echo "    sha256 \"${LINUX_X64_SHA}\""
+            echo '  end'
+            echo ''
+            echo '  def install'
+            echo '    system "tar", "-xzf", Dir["*.tar.gz"].first if Dir["*.tar.gz"].any?'
+            echo '    bin.install "ocloc" => "ocloc"'
+            echo '  end'
+            echo ''
+            echo '  test do'
+            echo '    system "#{bin}/ocloc", "--version"'
+            echo '  end'
+            echo 'end'
+          } > "$FORMULA_DIR/ocloc.rb"
           cd tap
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
