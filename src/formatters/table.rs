@@ -1,6 +1,79 @@
 use crate::types::{AnalyzeResult, FileCounts};
+use chrono::Local;
 
 pub fn format(a: &AnalyzeResult) -> String {
+    let mut output = String::new();
+
+    // Add report header
+    if let Some(ref path) = a.analyzed_path {
+        // Extract just the last component of the path for a cleaner title
+        let dir_name = std::path::Path::new(path)
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or(path);
+
+        let now = Local::now();
+        let friendly_date = now.format("%B %d, %Y at %I:%M %p").to_string();
+
+        output.push_str(
+            "═══════════════════════════════════════════════════════════════════════════════════\n",
+        );
+        output.push_str(&format!(
+            "                         REPORT FOR: {}\n",
+            dir_name.to_uppercase()
+        ));
+        output.push_str(&format!(
+            "                         Generated: {}\n",
+            friendly_date
+        ));
+        output.push_str("═══════════════════════════════════════════════════════════════════════════════════\n\n");
+    }
+
+    // Show file statistics if available as a clean table
+    if let Some(ref stats) = a.stats {
+        output.push_str("File Statistics:\n");
+        output.push_str("─────────────────────────────────────\n");
+        output.push_str(&format!(
+            "  Text Files    : {:>10}\n",
+            format_num(stats.total_files)
+        ));
+        output.push_str(&format!(
+            "  Unique Files  : {:>10}\n",
+            format_num(stats.unique_files)
+        ));
+        output.push_str(&format!(
+            "  Ignored Files : {:>10}\n",
+            format_num(stats.ignored_files)
+        ));
+        if stats.empty_files > 0 {
+            output.push_str(&format!(
+                "  Empty Files   : {:>10}\n",
+                format_num(stats.empty_files)
+            ));
+        }
+        output.push_str("─────────────────────────────────────\n\n");
+
+        // Show performance statistics
+        output.push_str("Performance:\n");
+        output.push_str("─────────────────────────────────────\n");
+        output.push_str(&format!(
+            "  Elapsed Time  : {:>10.2} s\n",
+            stats.elapsed_seconds
+        ));
+
+        let denom = if stats.elapsed_seconds > 0.0 {
+            stats.elapsed_seconds
+        } else {
+            1.0
+        };
+        let files_per_sec = stats.unique_files as f64 / denom;
+        output.push_str(&format!("  Files/sec     : {:>10.1}\n", files_per_sec));
+
+        let total_lines = a.totals.total;
+        let lines_per_sec = total_lines as f64 / denom;
+        output.push_str(&format!("  Lines/sec     : {:>10.0}\n", lines_per_sec));
+        output.push_str("─────────────────────────────────────\n\n");
+    }
     // Compute dynamic column widths with more generous minimums
     let mut lang_w: usize = 12; // increased minimum for Language column
     let mut files_w: usize = 8; // increased for "files" header
@@ -81,12 +154,15 @@ pub fn format(a: &AnalyzeResult) -> String {
     }
 
     // Add separator before totals like cloc does
-    lines.push(separator);
+    lines.push(separator.clone());
     // Emphasize totals
     let total_line = format_row("Total", &a.totals, &widths, &sep);
     lines.push(total_line);
+    // Add bottom separator to close the table
+    lines.push(separator);
 
-    lines.join("\n")
+    output.push_str(&lines.join("\n"));
+    output
 }
 
 #[cfg(test)]
@@ -125,6 +201,8 @@ mod tests {
             per_lang: per,
             totals,
             files_analyzed: totals.files,
+            stats: None,
+            analyzed_path: None,
         };
         let out = format(&a);
         assert!(out.contains("INI"));

@@ -9,7 +9,7 @@ mod run_impl;
 #[command(name = "ocloc", version, about = "Fast, reliable lines-of-code counter", long_about = None)]
 pub struct Args {
     /// Path to scan (directory or file)
-    #[arg(value_name = "PATH", default_value = ".", value_hint = ValueHint::DirPath)]
+    #[arg(value_name = "PATH", default_value = ".", value_hint = ValueHint::AnyPath)]
     pub path: PathBuf,
 
     /// Limit by comma-separated extensions (no dots), e.g. rs,py,js
@@ -21,11 +21,11 @@ pub struct Args {
     pub ignore_file: Option<PathBuf>,
 
     /// Output JSON instead of table
-    #[arg(long = "json", action = ArgAction::SetTrue)]
+    #[arg(long = "json", action = ArgAction::SetTrue, conflicts_with = "csv")]
     pub json: bool,
 
     /// Output CSV instead of table
-    #[arg(long = "csv", action = ArgAction::SetTrue)]
+    #[arg(long = "csv", action = ArgAction::SetTrue, conflicts_with = "json")]
     pub csv: bool,
 
     /// Follow symlinks

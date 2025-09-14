@@ -54,15 +54,7 @@ pub fn language_registry() -> &'static [LanguageSpec] {
 }
 
 pub fn find_language_for_path(path: &Path) -> Option<&'static str> {
-    // 1) By extension
-    if let Some(ext) = path.extension().and_then(|s| s.to_str()) {
-        let ext = ext.to_ascii_lowercase();
-        if let Some(&idx) = REGISTRY.by_ext.get(&ext) {
-            return Some(&language_registry()[idx].name);
-        }
-    }
-
-    // 2) Special filenames
+    // 1) Special filenames (take precedence over extension)
     if let Some(fname) = path.file_name().and_then(|s| s.to_str()) {
         let lower = fname.to_ascii_lowercase();
         if let Some(&idx) = REGISTRY.by_special.get(&lower) {
@@ -73,6 +65,14 @@ pub fn find_language_for_path(path: &Path) -> Option<&'static str> {
             "dockerfile" => return Some("Dockerfile"),
             "cmakelists.txt" => return Some("CMake"),
             _ => {}
+        }
+    }
+
+    // 2) By extension
+    if let Some(ext) = path.extension().and_then(|s| s.to_str()) {
+        let ext = ext.to_ascii_lowercase();
+        if let Some(&idx) = REGISTRY.by_ext.get(&ext) {
+            return Some(&language_registry()[idx].name);
         }
     }
 
@@ -206,5 +206,70 @@ mod tests {
         assert_eq!(find_language_for_path(&rst), Some("reStructuredText"));
         assert_eq!(find_language_for_path(&adoc), Some("AsciiDoc"));
         assert_eq!(find_language_for_path(&xml), Some("XML"));
+    }
+
+    #[test]
+    fn additional_special_filenames_detection() {
+        let dir = tempdir().unwrap();
+        let make = dir.path().join("Makefile");
+        let dk = dir.path().join("Dockerfile");
+        let cm = dir.path().join("CMakeLists.txt");
+        let build = dir.path().join("BUILD");
+        let ws = dir.path().join("WORKSPACE.bazel");
+        let gem = dir.path().join("Gemfile");
+        let just = dir.path().join("justfile");
+        let readme = dir.path().join("README");
+        std::fs::File::create(&make).unwrap();
+        std::fs::File::create(&dk).unwrap();
+        std::fs::File::create(&cm).unwrap();
+        std::fs::File::create(&build).unwrap();
+        std::fs::File::create(&ws).unwrap();
+        std::fs::File::create(&gem).unwrap();
+        std::fs::File::create(&just).unwrap();
+        std::fs::File::create(&readme).unwrap();
+        assert_eq!(find_language_for_path(&make), Some("Make"));
+        assert_eq!(find_language_for_path(&dk), Some("Dockerfile"));
+        assert_eq!(find_language_for_path(&cm), Some("CMake"));
+        assert_eq!(find_language_for_path(&build), Some("Starlark"));
+        assert_eq!(find_language_for_path(&ws), Some("Starlark"));
+        assert_eq!(find_language_for_path(&gem), Some("Ruby"));
+        assert_eq!(find_language_for_path(&just), Some("Just"));
+        assert_eq!(find_language_for_path(&readme), Some("Text"));
+    }
+
+    #[test]
+    fn languages_json_is_consistent() {
+        use std::collections::HashSet;
+        let specs = language_registry();
+        let mut names = HashSet::new();
+        let mut exts = HashSet::new();
+        let mut specials = HashSet::new();
+        for s in specs {
+            assert!(!s.name.trim().is_empty(), "language name must be non-empty");
+            assert!(names.insert(&s.name), "duplicate language name: {}", s.name);
+            for e in &s.extensions {
+                let norm = e.to_ascii_lowercase();
+                assert!(
+                    exts.insert(norm.clone()),
+                    "duplicate extension across languages: {}",
+                    norm
+                );
+            }
+            for f in &s.special_filenames {
+                let norm = f.to_ascii_lowercase();
+                assert!(
+                    specials.insert(norm.clone()),
+                    "duplicate special filename across languages: {}",
+                    norm
+                );
+            }
+            if let Some((ref a, ref b)) = s.block_markers {
+                assert!(
+                    !a.is_empty() && !b.is_empty(),
+                    "block markers must be non-empty for {}",
+                    s.name
+                );
+            }
+        }
     }
 }

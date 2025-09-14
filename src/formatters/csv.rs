@@ -55,6 +55,8 @@ mod tests {
             per_lang: per,
             totals,
             files_analyzed: totals.files,
+            stats: None,
+            analyzed_path: None,
         };
         let out = format(&a);
         assert!(out.contains("language,files,code,comment,blank,total"));

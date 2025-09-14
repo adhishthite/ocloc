@@ -33,6 +33,19 @@ pub struct AnalyzeResult {
     pub per_lang: IndexMap<String, FileCounts>,
     pub totals: FileCounts,
     pub files_analyzed: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stats: Option<FileStats>,
+    #[serde(skip_serializing)]
+    pub analyzed_path: Option<String>,
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct FileStats {
+    pub total_files: usize,
+    pub unique_files: usize,
+    pub ignored_files: usize,
+    pub empty_files: usize,
+    pub elapsed_seconds: f64,
 }
 
 #[cfg(test)]
@@ -70,6 +83,8 @@ mod tests {
             per_lang: per,
             totals,
             files_analyzed: totals.files,
+            stats: None,
+            analyzed_path: None,
         };
         let s = serde_json::to_string_pretty(&a).unwrap();
         assert!(s.contains("\"Markdown\""));
