@@ -132,38 +132,38 @@ jobs:
           VERSION="${TAG#v}"
           FORMULA_DIR="tap/Formula"
           mkdir -p "$FORMULA_DIR"
-          cat > "$FORMULA_DIR/ocloc.rb" <<'EOF'
-class Ocloc < Formula
-  desc "Fast, reliable lines-of-code counter"
-  homepage "https://github.com/$REPO_SLUG"
-  version "$VERSION"
-  license "MIT"
+          cat > "$FORMULA_DIR/ocloc.rb" <<-FORMULA
+          class Ocloc < Formula
+            desc "Fast, reliable lines-of-code counter"
+            homepage "https://github.com/${REPO_SLUG}"
+            version "${VERSION}"
+            license "MIT"
 
-  on_macos do
-    if Hardware::CPU.arm?
-      url "https://github.com/$REPO_SLUG/releases/download/$TAG/$MAC_ARM_TARBALL"
-      sha256 "$MAC_ARM_SHA"
-    else
-      url "https://github.com/$REPO_SLUG/releases/download/$TAG/$MAC_X64_TARBALL"
-      sha256 "$MAC_X64_SHA"
-    end
-  end
+            on_macos do
+              if Hardware::CPU.arm?
+                url "https://github.com/${REPO_SLUG}/releases/download/${TAG}/${MAC_ARM_TARBALL}"
+                sha256 "${MAC_ARM_SHA}"
+              else
+                url "https://github.com/${REPO_SLUG}/releases/download/${TAG}/${MAC_X64_TARBALL}"
+                sha256 "${MAC_X64_SHA}"
+              end
+            end
 
-  on_linux do
-    url "https://github.com/$REPO_SLUG/releases/download/$TAG/$LINUX_X64_TARBALL"
-    sha256 "$LINUX_X64_SHA"
-  end
+            on_linux do
+              url "https://github.com/${REPO_SLUG}/releases/download/${TAG}/${LINUX_X64_TARBALL}"
+              sha256 "${LINUX_X64_SHA}"
+            end
 
-  def install
-    system "tar", "-xzf", Dir["*.tar.gz"].first if Dir["*.tar.gz"].any?
-    bin.install "ocloc" => "ocloc"
-  end
+            def install
+              system "tar", "-xzf", Dir["*.tar.gz"].first if Dir["*.tar.gz"].any?
+              bin.install "ocloc" => "ocloc"
+            end
 
-  test do
-    system "#{bin}/ocloc", "--version"
-  end
-end
-EOF
+            test do
+              system "#{bin}/ocloc", "--version"
+            end
+          end
+          FORMULA
           cd tap
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
