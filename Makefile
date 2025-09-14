@@ -86,6 +86,16 @@ publish-crates:
 	@cargo publish
 	@echo "$(GREEN)✓ Published to crates.io$(NC)"
 
+## bump: Update Cargo.toml and CHANGELOG.md to VERSION=X.Y.Z
+.PHONY: bump
+bump:
+	@if [ -z "$(VERSION)" ]; then \
+		echo "$(RED)VERSION not set. Usage: make bump VERSION=X.Y.Z$(NC)"; \
+		exit 1; \
+	fi
+	@bash scripts/bump-version.sh "$(VERSION)"
+	@echo "$(GREEN)✓ Bumped to $(VERSION). Review changes and commit.$(NC)"
+
 ## install: Install ocloc to system (~/.cargo/bin)
 .PHONY: install
 install:

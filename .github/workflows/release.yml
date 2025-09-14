@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: Build (${{ matrix.target }} on ${{ matrix.os }})
+    name: Build
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -38,7 +38,7 @@ jobs:
       - name: Build release
         run: cargo build --release --locked --target ${{ matrix.target }}
       - name: Package tar.gz (Unix)
-        if: runner.os != 'Windows'
+        if: ${{ runner.os != 'Windows' }}
         run: |
           set -euo pipefail
           TARGET=${{ matrix.target }}
@@ -46,17 +46,8 @@ jobs:
           ARCHIVE="ocloc-${VERSION}-${TARGET}.tar.gz"
           tar -C target/${TARGET}/release -czf "$ARCHIVE" ocloc
           echo "ARCHIVE=$ARCHIVE" >> $GITHUB_ENV
-      - name: Package macOS artifact
-        if: runner.os == 'macOS'
-        run: |
-          set -euo pipefail
-          TARGET=$(rustc -vV | sed -n 's/^host: //p')
-          VERSION=$(sed -n 's/^version = \"\(.*\)\"/\1/p' Cargo.toml | head -n1)
-          ARCHIVE="ocloc-${VERSION}-${TARGET}.tar.gz"
-          tar -C target/release -czf "$ARCHIVE" ocloc
-          echo "ARCHIVE=$ARCHIVE" >> $GITHUB_ENV
       - name: Package Windows artifact
-        if: runner.os == 'Windows'
+        if: ${{ runner.os == 'Windows' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -68,7 +59,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ocloc-${{ runner.os }}
+          name: ocloc-${{ matrix.target }}
           path: ${{ env.ARCHIVE }}
 
   release:
@@ -109,7 +100,7 @@ jobs:
     name: Update Homebrew Tap
     needs: release
     runs-on: ubuntu-latest
-    if: ${{ secrets.TAP_REPO && secrets.TAP_TOKEN }}
+    if: ${{ secrets.TAP_REPO != '' && secrets.TAP_TOKEN != '' }}
     steps:
       - name: Checkout tap repo
         run: |
@@ -141,7 +132,7 @@ jobs:
           VERSION="${TAG#v}"
           FORMULA_DIR="tap/Formula"
           mkdir -p "$FORMULA_DIR"
-          cat > "$FORMULA_DIR/ocloc.rb" <<RUBY
+          cat > "$FORMULA_DIR/ocloc.rb" <<'RUBY'
 class Ocloc < Formula
   desc "Fast, reliable lines-of-code counter"
   homepage "https://github.com/$REPO_SLUG"
