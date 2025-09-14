@@ -13,17 +13,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-musl
-            musl: true
           - os: macos-13
             target: x86_64-apple-darwin
           - os: macos-latest
             target: aarch64-apple-darwin
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
     steps:
       - uses: actions/checkout@v4
       - name: Install Rust
@@ -32,29 +25,15 @@ jobs:
           targets: ${{ matrix.target }}
       - name: Cache cargo
         uses: swatinem/rust-cache@v2
-      - name: Install musl tools
-        if: ${{ matrix.musl == true }}
-        run: sudo apt-get update && sudo apt-get install -y musl-tools
       - name: Build release
         run: cargo build --release --locked --target ${{ matrix.target }}
-      - name: Package tar.gz (Unix)
-        if: ${{ runner.os != 'Windows' }}
+      - name: Package tar.gz
         run: |
           set -euo pipefail
           TARGET=${{ matrix.target }}
           VERSION=$(sed -n 's/^version = \"\(.*\)\"/\1/p' Cargo.toml | head -n1)
           ARCHIVE="ocloc-${VERSION}-${TARGET}.tar.gz"
           tar -C target/${TARGET}/release -czf "$ARCHIVE" ocloc
-          echo "ARCHIVE=$ARCHIVE" >> $GITHUB_ENV
-      - name: Package Windows artifact
-        if: ${{ runner.os == 'Windows' }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          TARGET=${{ matrix.target }}
-          VERSION=$(sed -n 's/^version = \"\(.*\)\"/\1/p' Cargo.toml | head -n1)
-          ARCHIVE="ocloc-${VERSION}-${TARGET}.zip"
-          zip -j "$ARCHIVE" target/${TARGET}/release/ocloc.exe >/dev/null
           echo "ARCHIVE=$ARCHIVE" >> $GITHUB_ENV
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -125,10 +104,8 @@ jobs:
           set -euo pipefail
           MAC_ARM_TARBALL=$(ls dist/ocloc-*-aarch64-apple-darwin.tar.gz | xargs -n1 basename)
           MAC_X64_TARBALL=$(ls dist/ocloc-*-x86_64-apple-darwin.tar.gz | xargs -n1 basename)
-          LINUX_X64_TARBALL=$(ls dist/ocloc-*-x86_64-unknown-linux-gnu.tar.gz | xargs -n1 basename)
           MAC_ARM_SHA=$(grep "$MAC_ARM_TARBALL" dist/SHA256SUMS.txt | awk '{print $1}')
           MAC_X64_SHA=$(grep "$MAC_X64_TARBALL" dist/SHA256SUMS.txt | awk '{print $1}')
-          LINUX_X64_SHA=$(grep "$LINUX_X64_TARBALL" dist/SHA256SUMS.txt | awk '{print $1}')
           VERSION="${TAG#v}"
           FORMULA_DIR="tap/Formula"
           mkdir -p "$FORMULA_DIR"
@@ -139,24 +116,16 @@ jobs:
             echo "  version \"${VERSION}\""
             echo '  license "MIT"'
             echo ''
-            echo '  on_macos do'
-            echo '    if Hardware::CPU.arm?'
-            echo "      url \"https://github.com/${REPO_SLUG}/releases/download/${TAG}/${MAC_ARM_TARBALL}\""
-            echo "      sha256 \"${MAC_ARM_SHA}\""
-            echo '    else'
-            echo "      url \"https://github.com/${REPO_SLUG}/releases/download/${TAG}/${MAC_X64_TARBALL}\""
-            echo "      sha256 \"${MAC_X64_SHA}\""
-            echo '    end'
-            echo '  end'
-            echo ''
-            echo '  on_linux do'
-            echo "    url \"https://github.com/${REPO_SLUG}/releases/download/${TAG}/${LINUX_X64_TARBALL}\""
-            echo "    sha256 \"${LINUX_X64_SHA}\""
+            echo '  if Hardware::CPU.arm?'
+            echo "    url \"https://github.com/${REPO_SLUG}/releases/download/${TAG}/${MAC_ARM_TARBALL}\""
+            echo "    sha256 \"${MAC_ARM_SHA}\""
+            echo '  else'
+            echo "    url \"https://github.com/${REPO_SLUG}/releases/download/${TAG}/${MAC_X64_TARBALL}\""
+            echo "    sha256 \"${MAC_X64_SHA}\""
             echo '  end'
             echo ''
             echo '  def install'
-            echo '    system "tar", "-xzf", Dir["*.tar.gz"].first if Dir["*.tar.gz"].any?'
-            echo '    bin.install "ocloc" => "ocloc"'
+            echo '    bin.install "ocloc"'
             echo '  end'
             echo ''
             echo '  test do'
