@@ -6,6 +6,13 @@ The format is based on Keep a Changelog and adheres to Semantic Versioning.
 
 ## [Unreleased]
 
+## [0.4.1] - 2025-09-15
+
+### Fixed
+
+- Removed homebrew-ocloc directory from Git tracking to fix CI submodule warnings
+- Added homebrew-ocloc to .gitignore to prevent future tracking issues
+
 ## [0.4.0] - 2025-09-15
 
 ### Added
