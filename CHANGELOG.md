@@ -6,6 +6,13 @@ The format is based on Keep a Changelog and adheres to Semantic Versioning.
 
 ## [Unreleased]
 
+## [0.5.0] - 2025-09-15
+
+### Changed
+
+- Updated build process and CI workflow optimizations
+- Minor improvements to release pipeline
+
 ## [0.4.1] - 2025-09-15
 
 ### Fixed

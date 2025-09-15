@@ -1,6 +1,6 @@
 [package]
 name = "ocloc"
-version = "0.4.1"
+version = "0.5.0"
 edition = "2024"
 description = "Fast, reliable lines-of-code counter with JSON/CSV output"
 license = "MIT"
