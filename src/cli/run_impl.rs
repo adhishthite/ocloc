@@ -1,11 +1,13 @@
 use anyhow::Result;
-use rayon::prelude::*;
+// use rayon::prelude::*; // not used after switching to WalkParallel
 use std::collections::HashSet;
 use std::fs;
+use std::sync::Arc;
+use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::Instant;
 
 use crate::languages::find_language_for_path;
-use crate::traversal::{TraversalOptions, collect_files};
+use crate::traversal::{TraversalOptions, build_walk_builder};
 use crate::types::{AnalyzeResult, FileCounts, FileStats};
 use crate::{analyzer, formatters};
 
@@ -41,21 +43,18 @@ pub fn run_with_args(args: Args) -> Result<()> {
             eprintln!("Extensions filter: {}", list);
         }
     }
-    let files = collect_files(&args.path, opts)?;
-    let total_files = files.len();
-    if args.verbose > 0 {
-        eprintln!("Found {} files to analyze", total_files);
-    }
+    // Configure analyzer global settings (no-mmap and threshold)
+    analyzer::set_analyzer_config(args.no_mmap, args.mmap_large);
+    // Build a parallel walker; we'll analyze as we traverse
+    let walker = build_walk_builder(&args.path, &opts).build_parallel();
 
-    // Track statistics
-    let mut empty_files = 0usize;
-    let mut ignored_files = 0usize;
+    // Track statistics (legacy counters not used after parallel refactor)
 
-    // Progress setup
-    let pb = if args.progress {
-        let pb = indicatif::ProgressBar::new(files.len() as u64);
+    // Progress setup (unknown length with parallel walk)
+    let pb = if args.progress && !args.ultra {
+        let pb = indicatif::ProgressBar::new_spinner();
         if let Ok(style) =
-            indicatif::ProgressStyle::with_template("{spinner} {pos}/{len} files {wide_bar} {eta}")
+            indicatif::ProgressStyle::with_template("{spinner} {pos} files {elapsed}")
         {
             pb.set_style(style.tick_chars("⠁⠃⠇⠋⠙⠸⢰⣠⣄⡆"));
         }
@@ -64,63 +63,120 @@ pub fn run_with_args(args: Args) -> Result<()> {
         None
     };
 
-    // First pass: categorize files
-    let categorized: Vec<(Option<String>, &std::path::PathBuf, bool)> = files
-        .iter()
-        .map(|path| {
-            let lang = find_language_for_path(path);
-            let is_empty = fs::metadata(path).map(|m| m.len() == 0).unwrap_or(false);
-            (lang.map(|l| l.to_string()), path, is_empty)
-        })
-        .collect();
+    // Switch to direct parallel analysis over files, with batched progress updates
+    let ignored_counter = Arc::new(AtomicUsize::new(0));
+    let empty_counter = Arc::new(AtomicUsize::new(0));
+    let progress_counter = Arc::new(AtomicUsize::new(0));
+    let global_map: Arc<std::sync::Mutex<indexmap::IndexMap<String, FileCounts>>> =
+        Arc::new(std::sync::Mutex::new(indexmap::IndexMap::new()));
 
-    // Count statistics
-    for (lang, _path, is_empty) in &categorized {
-        if lang.is_none() || lang.as_ref().map(|l| l.is_empty()).unwrap_or(true) {
-            ignored_files += 1;
-        } else if *is_empty {
-            empty_files += 1;
+    struct ThreadAgg {
+        local: indexmap::IndexMap<String, FileCounts>,
+        global: Arc<std::sync::Mutex<indexmap::IndexMap<String, FileCounts>>>,
+    }
+    impl ThreadAgg {
+        fn new(global: Arc<std::sync::Mutex<indexmap::IndexMap<String, FileCounts>>>) -> Self {
+            Self {
+                local: indexmap::IndexMap::new(),
+                global,
+            }
+        }
+        fn add(&mut self, lang: String, counts: FileCounts) {
+            let entry = self.local.entry(lang).or_default();
+            entry.merge(&counts);
+        }
+    }
+    impl Drop for ThreadAgg {
+        fn drop(&mut self) {
+            if let Ok(mut g) = self.global.lock() {
+                for (lang, counts) in self.local.drain(..) {
+                    let e = g.entry(lang).or_default();
+                    e.merge(&counts);
+                }
+            }
         }
     }
 
-    let results: Vec<(String, FileCounts)> = categorized
-        .into_par_iter()
-        .filter_map(|(lang, path, is_empty)| {
-            if let Some(l) = lang
-                && !l.is_empty()
-            {
-                // Skip empty files if the flag is set
-                if args.skip_empty && is_empty {
-                    if args.verbose > 1 {
-                        eprintln!("Skipping empty file: {}", path.display());
+    walker.run(|| {
+        let ignored_counter = ignored_counter.clone();
+        let empty_counter = empty_counter.clone();
+        let progress_counter = progress_counter.clone();
+        let mut agg = ThreadAgg::new(global_map.clone());
+        let pb_inner = pb.as_ref().cloned();
+        Box::new(move |entry: Result<ignore::DirEntry, ignore::Error>| {
+            let dent: ignore::DirEntry = match entry {
+                Ok(d) => d,
+                Err(_) => return ignore::WalkState::Continue,
+            };
+            let path = dent.path();
+            if !path.is_file() {
+                return ignore::WalkState::Continue;
+            }
+
+            // Count every visited file for stats/progress
+            let n = progress_counter.fetch_add(1, Ordering::Relaxed) + 1;
+            if let Some(pb) = &pb_inner {
+                if n % 128 == 0 {
+                    pb.set_position(n as u64);
+                }
+            }
+
+            // Detect language (may read shebang)
+            let lang_opt = find_language_for_path(path);
+            if lang_opt.is_none() {
+                ignored_counter.fetch_add(1, Ordering::Relaxed);
+                return ignore::WalkState::Continue;
+            }
+            let lang = lang_opt.unwrap().to_string();
+
+            // Guard metadata calls: only when filters require it
+            if opts.min_size.is_some() || opts.max_size.is_some() || args.skip_empty {
+                if let Ok(md) = fs::metadata(path) {
+                    // Apply min/max size filters if provided
+                    if let Some(min) = opts.min_size {
+                        if md.len() < min {
+                            return ignore::WalkState::Continue;
+                        }
                     }
-                    return None;
+                    if let Some(max) = opts.max_size {
+                        if md.len() > max {
+                            return ignore::WalkState::Continue;
+                        }
+                    }
+                    if args.skip_empty && md.len() == 0 {
+                        empty_counter.fetch_add(1, Ordering::Relaxed);
+                        return ignore::WalkState::Continue;
+                    }
                 }
-                return Some((l, path));
             }
-            None
-        })
-        .filter_map(|(lang, path)| {
-            // Check if file still exists and is readable
-            if fs::metadata(path).is_ok() {
-                let counts = analyzer::analyze_file(path).unwrap_or_else(|_| FileCounts::default());
-                if let Some(ref pb) = pb {
-                    pb.inc(1);
+
+            let counts = analyzer::analyze_file(path).unwrap_or_else(|_| FileCounts::default());
+            if counts.files > 0 {
+                if args.ultra {
+                    // In ultra mode, avoid per-language aggregation; accumulate totals only
+                    let total_only = agg.local.entry("__TOTAL__".to_string()).or_default();
+                    total_only.merge(&counts);
+                } else {
+                    agg.add(lang, counts);
                 }
-                Some((lang, counts))
-            } else {
-                None
             }
+            ignore::WalkState::Continue
         })
-        .collect();
+    });
+
+    let per_lang_map = Arc::try_unwrap(global_map).unwrap().into_inner().unwrap();
 
     let mut per_lang: indexmap::IndexMap<String, FileCounts> = indexmap::IndexMap::new();
     let mut totals = FileCounts::default();
-
-    for (lang, counts) in results.into_iter() {
-        let entry = per_lang.entry(lang).or_default();
-        entry.merge(&counts);
-        totals.merge(&counts);
+    if args.ultra {
+        if let Some(total_counts) = per_lang_map.get("__TOTAL__") {
+            totals = *total_counts;
+        }
+    } else {
+        for (lang, counts) in per_lang_map.iter() {
+            per_lang.insert(lang.clone(), *counts);
+            totals.merge(counts);
+        }
     }
 
     // Sort per_lang by descending code (then total) before serializing/printing
@@ -136,10 +192,18 @@ pub fn run_with_args(args: Args) -> Result<()> {
     let elapsed = start_time.elapsed().as_secs_f64();
 
     let stats = FileStats {
-        total_files,
-        unique_files: total_files - ignored_files, // Files that have a recognized language
-        ignored_files,
-        empty_files: if args.skip_empty { 0 } else { empty_files },
+        total_files: progress_counter.load(Ordering::Relaxed),
+        unique_files: if args.ultra {
+            totals.files
+        } else {
+            per_lang_map.values().map(|c| c.files).sum::<usize>()
+        },
+        ignored_files: ignored_counter.load(Ordering::Relaxed),
+        empty_files: if args.skip_empty {
+            0
+        } else {
+            empty_counter.load(Ordering::Relaxed)
+        },
         elapsed_seconds: elapsed,
     };
 
@@ -182,7 +246,7 @@ pub fn run_with_args(args: Args) -> Result<()> {
         return Ok(());
     }
 
-    // default pretty table
+    // default pretty table (ultra still prints table, but with only totals)
     let s = formatters::table::format(&analyze);
     println!("{}", s);
     Ok(())

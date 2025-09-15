@@ -13,7 +13,7 @@ pub struct TraversalOptions {
     pub allowed_exts: Option<HashSet<String>>, // lowercase, no dot
 }
 
-pub fn collect_files(root: &Path, opts: TraversalOptions) -> Result<Vec<PathBuf>> {
+pub fn build_walk_builder(root: &Path, opts: &TraversalOptions) -> WalkBuilder {
     let mut builder = WalkBuilder::new(root);
     builder.follow_links(opts.follow_symlinks);
     builder.hidden(false);
@@ -22,7 +22,6 @@ pub fn collect_files(root: &Path, opts: TraversalOptions) -> Result<Vec<PathBuf>
     builder.git_global(true);
 
     if let Some(ref custom) = opts.ignore_file {
-        // The ignore crate doesn't directly take a custom path easily for patterns; naive load
         if let Ok(patterns) = fs::read_to_string(custom) {
             let mut ob = OverrideBuilder::new(root);
             for line in patterns.lines() {
@@ -38,6 +37,25 @@ pub fn collect_files(root: &Path, opts: TraversalOptions) -> Result<Vec<PathBuf>
             }
         }
     }
+
+    if let Some(ref allowed) = opts.allowed_exts {
+        // Limit walker by glob patterns for allowed extensions to reduce I/O
+        // This is a best-effort filter; analyzer still checks language.
+        let mut ob = OverrideBuilder::new(root);
+        for ext in allowed {
+            let _ = ob.add(&format!("**/*.{}", ext));
+        }
+        if let Ok(ov) = ob.build() {
+            builder.overrides(ov);
+        }
+    }
+
+    builder
+}
+
+#[allow(dead_code)]
+pub fn collect_files(root: &Path, opts: TraversalOptions) -> Result<Vec<PathBuf>> {
+    let builder = build_walk_builder(root, &opts);
 
     let mut out = Vec::new();
     for dent in builder.build() {
@@ -70,18 +88,6 @@ pub fn collect_files(root: &Path, opts: TraversalOptions) -> Result<Vec<PathBuf>
                 && md.len() > max
             {
                 continue;
-            }
-        }
-
-        // skip obvious binaries by a quick UTF-8 check of the first chunk
-        if let Ok(mut f) = fs::File::open(path) {
-            use std::io::Read;
-            let mut buf = [0u8; 512];
-            if let Ok(n) = f.read(&mut buf) {
-                let slice = &buf[..n];
-                if std::str::from_utf8(slice).is_err() {
-                    continue;
-                }
             }
         }
 

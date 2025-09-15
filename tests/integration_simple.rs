@@ -30,7 +30,7 @@ fn analyze_reader_parity_with_analyze_file() {
 
     let file_counts = ocloc::analyzer::analyze_file(&path).unwrap();
     let data = std::fs::read(&path).unwrap();
-    let reader_counts = ocloc::analyzer::analyze_reader(Cursor::new(data), &path).unwrap();
+    let reader_counts = ocloc::analyzer::analyze_reader_owned(Cursor::new(data), &path).unwrap();
     assert_eq!(file_counts.total, reader_counts.total);
     assert_eq!(file_counts.code, reader_counts.code);
     assert_eq!(file_counts.comment, reader_counts.comment);

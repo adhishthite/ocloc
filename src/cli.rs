@@ -60,6 +60,21 @@ pub struct Args {
     /// Skip empty files (files with 0 bytes)
     #[arg(long = "skip-empty", action = ArgAction::SetTrue)]
     pub skip_empty: bool,
+
+    /// Enable memory-mapping for files larger than this size in bytes (default: 4 MiB)
+    #[arg(long = "mmap-large", value_name = "BYTES")]
+    pub mmap_large: Option<u64>,
+
+    /// Disable memory-mapping optimization entirely
+    #[arg(long = "no-mmap", action = ArgAction::SetTrue)]
+    pub no_mmap: bool,
+
+    /// Ultra-fast mode: prioritize speed over details
+    /// - Disables progress and per-language aggregation
+    /// - Minimizes metadata calls
+    /// - Lowers mmap threshold aggressively (unless --no-mmap)
+    #[arg(long = "ultra", action = ArgAction::SetTrue)]
+    pub ultra: bool,
 }
 
 pub fn run() -> Result<()> {

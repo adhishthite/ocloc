@@ -1,120 +1,224 @@
 use std::fs::File;
-use std::io::{BufRead, BufReader};
+use std::io::{self, BufRead, BufReader};
 use std::path::Path;
 
 use anyhow::{Context, Result};
 
-use crate::languages::language_registry;
+use crate::languages::{find_language_index_for_path, language_markers_bytes};
 use crate::types::FileCounts;
+use once_cell::sync::OnceCell;
+
+struct AnalyzerConfig {
+    no_mmap: bool,
+    mmap_threshold: u64,
+}
+
+static ANALYZER_CONFIG: OnceCell<AnalyzerConfig> = OnceCell::new();
+
+pub fn set_analyzer_config(no_mmap: bool, mmap_threshold: Option<u64>) {
+    let _ = ANALYZER_CONFIG.set(AnalyzerConfig {
+        no_mmap,
+        mmap_threshold: mmap_threshold.unwrap_or(4 * 1024 * 1024),
+    });
+}
 
 pub fn analyze_file(path: &Path) -> Result<FileCounts> {
     let file = File::open(path).with_context(|| format!("open file: {}", path.display()))?;
-    let reader = BufReader::new(file);
-    analyze_reader(reader, path)
+    // Use mmap for large files to reduce syscall overhead (configurable)
+    if let Some(cfg) = ANALYZER_CONFIG.get() {
+        if !cfg.no_mmap {
+            if let Ok(meta) = file.metadata() {
+                if meta.len() >= cfg.mmap_threshold {
+                    // Safety: file is not mutated while mapping; read-only map
+                    if let Ok(mmap) = unsafe { memmap2::Mmap::map(&file) } {
+                        let mut rdr = std::io::Cursor::new(&mmap[..]);
+                        return analyze_reader(&mut rdr, path);
+                    }
+                }
+            }
+        }
+    }
+    let mut reader = BufReader::new(file);
+    analyze_reader(&mut reader, path)
 }
 
-pub fn analyze_reader<R: BufRead>(mut reader: R, path_hint: &Path) -> Result<FileCounts> {
+pub fn analyze_reader<R: BufRead + ?Sized>(reader: &mut R, path_hint: &Path) -> Result<FileCounts> {
     // Locate language by extension; unknown -> skip counts but still produce 0s
-    let lang = super::languages::find_language_for_path(path_hint);
+    let lang_idx = find_language_index_for_path(path_hint);
 
     let mut counts = FileCounts::one_file();
-    let mut buf = String::new();
-    let mut in_block: Option<(String, String)> = None;
+    let mut buf = Vec::with_capacity(8192);
+    let mut in_block: Option<(Vec<u8>, Vec<u8>)> = None;
 
     // Obtain markers
-    let (line_markers, block_markers): (Vec<String>, Option<(String, String)>) =
-        if let Some(name) = lang {
-            if let Some(lang) = language_registry().iter().find(|l| l.name == name) {
-                (lang.line_markers.clone(), lang.block_markers.clone())
-            } else {
-                (Vec::new(), None)
-            }
-        } else {
-            (Vec::new(), None)
-        };
+    type MarkersTuple = (&'static [Vec<u8>], Option<(&'static [u8], &'static [u8])>);
+    let (line_markers_vec, block_markers_bytes): MarkersTuple = if let Some(idx) = lang_idx {
+        language_markers_bytes(idx)
+    } else {
+        (&[], None)
+    };
 
+    // Fast zero-byte file handling if possible
+    if let Ok(slice) = reader.fill_buf() {
+        if slice.is_empty() {
+            return Ok(counts);
+        }
+    }
+
+    // Process by chunks and split on newlines using memchr for speed
+    let mut pending: Vec<u8> = Vec::new();
     loop {
-        buf.clear();
-        let bytes = reader.read_line(&mut buf)?;
-        if bytes == 0 {
+        buf.resize(8192, 0);
+        let n = match io::Read::read(reader, &mut buf) {
+            Ok(0) => 0,
+            Ok(n) => n,
+            Err(e) if e.kind() == io::ErrorKind::Interrupted => continue,
+            Err(e) => return Err(e).with_context(|| format!("read: {}", path_hint.display())),
+        };
+        if n == 0 {
+            if !pending.is_empty() {
+                process_line(
+                    &mut counts,
+                    line_markers_vec,
+                    &block_markers_bytes,
+                    &mut in_block,
+                    trim_cr(&pending),
+                );
+                pending.clear();
+            }
             break;
         }
-        counts.total += 1;
-
-        let line = buf.trim_end_matches(['\n', '\r']);
-        let trimmed = line.trim();
-        if trimmed.is_empty() {
-            counts.blank += 1;
-            continue;
-        }
-
-        // HTML-like block comments, C-style, etc.
-        let mut handled_comment = false;
-        let cur = trimmed;
-
-        // If already in a block, search for end
-        if let Some((ref _start, ref end)) = in_block {
-            if let Some(idx) = cur.find(end.as_str()) {
-                // block ends on this line; may have code before/after comment
-                let after = &cur[idx + end.len()..];
-                in_block = None;
-                // If there is non-whitespace after end, treat as code
-                if after.trim().is_empty() {
-                    counts.comment += 1; // treat entire line as comment
-                } else {
-                    counts.code += 1;
-                }
-                handled_comment = true;
+        let chunk = &buf[..n];
+        let mut start = 0;
+        for i in memchr::memchr_iter(b'\n', chunk) {
+            if pending.is_empty() {
+                process_line(
+                    &mut counts,
+                    line_markers_vec,
+                    &block_markers_bytes,
+                    &mut in_block,
+                    trim_cr(&chunk[start..i]),
+                );
             } else {
-                counts.comment += 1;
-                handled_comment = true;
+                pending.extend_from_slice(&chunk[start..i]);
+                let line = trim_cr(&pending);
+                process_line(
+                    &mut counts,
+                    line_markers_vec,
+                    &block_markers_bytes,
+                    &mut in_block,
+                    line,
+                );
+                pending.clear();
             }
-        } else if let Some((ref start, ref end)) = block_markers
-            && let Some(start_idx) = cur.find(start.as_str())
-        {
-            if let Some(end_idx) = cur[start_idx + start.len()..].find(end.as_str()) {
-                // start and end on same line
-                let before = &cur[..start_idx];
-                let after = &cur[start_idx + start.len() + end_idx + end.len()..];
-                if before.trim().is_empty() && after.trim().is_empty() {
-                    counts.comment += 1;
-                } else {
-                    counts.code += 1; // mixed line counts as code
-                }
-                handled_comment = true;
-            } else {
-                // starts block; remains open
-                in_block = Some((start.clone(), end.clone()));
-                let before = &cur[..start_idx];
-                if before.trim().is_empty() {
-                    counts.comment += 1;
-                } else {
-                    counts.code += 1; // code before comment start
-                }
-                handled_comment = true;
-            }
+            start = i + 1;
         }
-
-        if handled_comment {
-            continue;
-        }
-
-        // Line comments
-        let mut is_line_comment = false;
-        for m in &line_markers {
-            if cur.trim_start().starts_with(m.as_str()) {
-                is_line_comment = true;
-                break;
-            }
-        }
-        if is_line_comment {
-            counts.comment += 1;
-        } else {
-            counts.code += 1;
+        if start < chunk.len() {
+            pending.extend_from_slice(&chunk[start..]);
         }
     }
 
     Ok(counts)
+}
+
+// Backward-compatible wrapper for callers that pass an owned reader
+pub fn analyze_reader_owned<R: BufRead>(mut reader: R, path_hint: &Path) -> Result<FileCounts> {
+    analyze_reader(&mut reader, path_hint)
+}
+
+fn trim_ascii_start(mut s: &[u8]) -> &[u8] {
+    while let Some((&b, rest)) = s.split_first() {
+        if b.is_ascii_whitespace() {
+            s = rest;
+        } else {
+            break;
+        }
+    }
+    s
+}
+
+fn trim_cr(s: &[u8]) -> &[u8] {
+    if let Some((&last, body)) = s.split_last() {
+        if last == b'\r' {
+            return body;
+        }
+    }
+    s
+}
+
+fn find_bytes(hay: &[u8], needle: &[u8]) -> Option<usize> {
+    if needle.is_empty() {
+        return Some(0);
+    }
+    memchr::memmem::find(hay, needle)
+}
+
+fn process_line(
+    counts: &mut FileCounts,
+    line_markers: &[Vec<u8>],
+    block_markers: &Option<(&[u8], &[u8])>,
+    in_block: &mut Option<(Vec<u8>, Vec<u8>)>,
+    raw: &[u8],
+) {
+    counts.total += 1;
+    let trimmed = trim_ascii_start(raw);
+    if trimmed.is_empty() {
+        counts.blank += 1;
+        return;
+    }
+
+    // If already in a block, search for end
+    if let &mut Some((_, ref end)) = in_block {
+        if let Some(idx) = find_bytes(trimmed, end.as_slice()) {
+            let after = &trimmed[idx + end.len()..];
+            *in_block = None;
+            if trim_ascii_start(after).is_empty() {
+                counts.comment += 1;
+            } else {
+                counts.code += 1;
+            }
+            return;
+        } else {
+            counts.comment += 1;
+            return;
+        }
+    }
+
+    if let Some((start, end)) = block_markers {
+        if let Some(start_idx) = find_bytes(trimmed, start) {
+            if let Some(end_rel) = find_bytes(&trimmed[start_idx + start.len()..], end) {
+                let before = &trimmed[..start_idx];
+                let after = &trimmed[start_idx + start.len() + end_rel + end.len()..];
+                if trim_ascii_start(before).is_empty() && trim_ascii_start(after).is_empty() {
+                    counts.comment += 1;
+                } else {
+                    counts.code += 1;
+                }
+                return;
+            } else {
+                // starts block; remains open
+                *in_block = Some((start.to_vec(), end.to_vec()));
+                let before = &trimmed[..start_idx];
+                if trim_ascii_start(before).is_empty() {
+                    counts.comment += 1;
+                } else {
+                    counts.code += 1;
+                }
+                return;
+            }
+        }
+    }
+
+    // Line comments
+    let leading = trim_ascii_start(trimmed);
+    for bytes in line_markers {
+        let bytes = bytes.as_slice();
+        if leading.len() >= bytes.len() && &leading[..bytes.len()] == bytes {
+            counts.comment += 1;
+            return;
+        }
+    }
+    counts.code += 1;
 }
 
 #[cfg(test)]

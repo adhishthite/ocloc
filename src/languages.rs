@@ -19,12 +19,17 @@ pub struct LanguageRegistry {
     specs: Vec<LanguageSpec>,
     by_ext: HashMap<String, usize>,
     by_special: HashMap<String, usize>,
+    // Precomputed bytes per language index for fast access
+    line_markers_bytes: Vec<Vec<Vec<u8>>>,
+    block_markers_bytes: Vec<Option<(Vec<u8>, Vec<u8>)>>,
 }
 
 impl LanguageRegistry {
     fn from_specs(specs: Vec<LanguageSpec>) -> Self {
         let mut by_ext = HashMap::new();
         let mut by_special = HashMap::new();
+        let mut line_markers_bytes = Vec::with_capacity(specs.len());
+        let mut block_markers_bytes = Vec::with_capacity(specs.len());
         for (i, spec) in specs.iter().enumerate() {
             for ext in &spec.extensions {
                 by_ext.insert(ext.to_ascii_lowercase(), i);
@@ -32,11 +37,24 @@ impl LanguageRegistry {
             for name in &spec.special_filenames {
                 by_special.insert(name.to_ascii_lowercase(), i);
             }
+            line_markers_bytes.push(
+                spec.line_markers
+                    .iter()
+                    .map(|s| s.as_bytes().to_vec())
+                    .collect(),
+            );
+            block_markers_bytes.push(
+                spec.block_markers
+                    .as_ref()
+                    .map(|(a, b)| (a.as_bytes().to_vec(), b.as_bytes().to_vec())),
+            );
         }
         Self {
             specs,
             by_ext,
             by_special,
+            line_markers_bytes,
+            block_markers_bytes,
         }
     }
 }
@@ -89,6 +107,53 @@ pub fn find_language_for_path(path: &Path) -> Option<&'static str> {
         }
     }
     None
+}
+
+pub fn find_language_index_for_path(path: &Path) -> Option<usize> {
+    if let Some(fname) = path.file_name().and_then(|s| s.to_str()) {
+        let lower = fname.to_ascii_lowercase();
+        if let Some(&idx) = REGISTRY.by_special.get(&lower) {
+            return Some(idx);
+        }
+        match lower.as_str() {
+            "makefile" => return language_registry().iter().position(|l| l.name == "Make"),
+            "dockerfile" => {
+                return language_registry()
+                    .iter()
+                    .position(|l| l.name == "Dockerfile");
+            }
+            "cmakelists.txt" => return language_registry().iter().position(|l| l.name == "CMake"),
+            _ => {}
+        }
+    }
+    if let Some(ext) = path.extension().and_then(|s| s.to_str()) {
+        let ext = ext.to_ascii_lowercase();
+        if let Some(&idx) = REGISTRY.by_ext.get(&ext) {
+            return Some(idx);
+        }
+    }
+    if path.extension().is_none()
+        && let Ok(f) = File::open(path)
+    {
+        let mut rdr = BufReader::new(f);
+        let mut first = String::new();
+        if rdr.read_line(&mut first).is_ok()
+            && let Some(lang) = parse_shebang(&first)
+        {
+            return language_registry().iter().position(|l| l.name == lang);
+        }
+    }
+    None
+}
+
+pub type LanguageMarkersBytes = (&'static [Vec<u8>], Option<(&'static [u8], &'static [u8])>);
+
+pub fn language_markers_bytes(idx: usize) -> LanguageMarkersBytes {
+    let lines: &'static [Vec<u8>] = &REGISTRY.line_markers_bytes[idx];
+    let blocks = REGISTRY.block_markers_bytes[idx]
+        .as_ref()
+        .map(|(a, b)| (a.as_slice(), b.as_slice()));
+    (lines, blocks)
 }
 
 fn parse_shebang(line: &str) -> Option<&'static str> {

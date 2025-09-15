@@ -299,7 +299,7 @@ pub fn run_diff(args: &DiffArgs) -> Result<()> {
 fn analyze_bytes(bytes: &[u8], path_hint: &Path) -> Result<FileCounts> {
     let cursor = Cursor::new(bytes);
     let reader = std::io::BufReader::new(cursor);
-    analyzer::analyze_reader(reader, path_hint)
+    analyzer::analyze_reader_owned(reader, path_hint)
 }
 
 fn print_table(s: &DiffSummary) {

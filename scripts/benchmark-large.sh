@@ -19,7 +19,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${BLUE}        ocloc vs cloc — Large Repo Benchmark (elasticsearch)${NC}"
+echo -e "${BLUE}        ocloc vs cloc vs tokei — Large Repo Benchmark (elasticsearch)${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
 WORKDIR="$(mktemp -d -t ocloc-bench-large-XXXXXX)"
@@ -101,6 +101,25 @@ parse_cloc_sum() {
   echo "$files $blank $comment $code $total"
 }
 
+parse_tokei_totals() {
+  local s="$1"
+  local line
+  line=$(printf '%s\n' "$s" | grep -E '^[[:space:]]*Total[[:space:]]' | tail -n 1 || true)
+  if [[ -z "$line" ]]; then
+    echo "0 0 0 0 0"
+    return
+  fi
+  local nums
+  nums=($(echo "$line" | grep -Eo '[0-9]+'))
+  local files blank comment code total
+  files=${nums[0]}
+  total=${nums[1]}
+  blank=${nums[2]}
+  comment=${nums[3]}
+  code=${nums[4]}
+  echo "$files $blank $comment $code $total"
+}
+
 echo -e "${BLUE}${BOLD}Running ocloc...${NC}"
 OCLOC_OUT=""
 OCLOC_TIME=""
@@ -121,14 +140,40 @@ if $CLOC_PRESENT; then
   read -r cfiles cblank ccomment ccode ctotal <<<"$(parse_cloc_sum "$CLOC_OUT")"
 fi
 
+TOKEI_PRESENT=true
+if ! command -v tokei >/dev/null 2>&1; then
+  TOKEI_PRESENT=false
+  echo -e "${YELLOW}tokei is not installed; skipping tokei run. Install with: cargo install tokei${NC}"
+fi
+
+if $TOKEI_PRESENT; then
+  echo -e "${BLUE}${BOLD}Running tokei...${NC}"
+  TOKEI_OUT=""
+  TOKEI_TIME=""
+  measure_time TOKEI_OUT TOKEI_TIME tokei .
+  read -r tfiles tblank tcomment tcode ttotal <<<"$(parse_tokei_totals "$TOKEI_OUT")"
+fi
+
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${BOLD}Results (elasticsearch)${NC}"
 printf "%-10s  %10s  %10s  %10s  %10s  %10s  %10s\n" "Tool" "Time(s)" "Files" "Blank" "Comment" "Code" "Total"
 printf "%-10s  %10s  %10d  %10d  %10d  %10d  %10d\n" "ocloc" "$OCLOC_TIME" "$ofiles" "$oblank" "$ocomment" "$ocode" "$ototal"
 if $CLOC_PRESENT; then
   printf "%-10s  %10s  %10d  %10d  %10d  %10d  %10d\n" "cloc" "$CLOC_TIME" "$cfiles" "$cblank" "$ccomment" "$ccode" "$ctotal"
-  SPEEDUP=$(awk -v a="$CLOC_TIME" -v b="$OCLOC_TIME" 'BEGIN{ if (b>0) printf "%.2fx", a/b; else print "N/A" }')
-  echo -e "${GREEN}Speedup (cloc/ocloc):${NC} $SPEEDUP"
+fi
+if $TOKEI_PRESENT; then
+  printf "%-10s  %10s  %10d  %10d  %10d  %10d  %10d\n" "tokei" "$TOKEI_TIME" "$tfiles" "$tblank" "$tcomment" "$tcode" "$ttotal"
+fi
+
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${GREEN}Speedup comparisons:${NC}"
+if $CLOC_PRESENT; then
+  SPEEDUP_CLOC=$(awk -v a="$CLOC_TIME" -v b="$OCLOC_TIME" 'BEGIN{ if (b>0) printf "%.2fx", a/b; else print "N/A" }')
+  echo -e "  ocloc vs cloc:  ${BOLD}$SPEEDUP_CLOC${NC} faster"
+fi
+if $TOKEI_PRESENT; then
+  SPEEDUP_TOKEI=$(awk -v a="$TOKEI_TIME" -v b="$OCLOC_TIME" 'BEGIN{ if (b>0) printf "%.2fx", a/b; else print "N/A" }')
+  echo -e "  ocloc vs tokei: ${BOLD}$SPEEDUP_TOKEI${NC} faster"
 fi
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
