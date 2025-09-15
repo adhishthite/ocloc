@@ -6,6 +6,28 @@ The format is based on Keep a Changelog and adheres to Semantic Versioning.
 
 ## [Unreleased]
 
+## [0.4.0] - 2025-09-15
+
+### Added
+
+- Memory-mapping support for large files (>64MB) with automatic fallback
+- Ultra-fast mode (`--ultra`/`-u`) that skips comment analysis for maximum speed
+- Skip empty files option (`--skip-empty`) to exclude zero-byte files from analysis
+- Custom benchmark script with detailed performance metrics
+- Enhanced benchmark scripts with configurable runs and comparison tools
+
+### Improved
+
+- Significant performance improvements through memory-mapped I/O for large files
+- Optimized analyzer with better buffer reuse and reduced allocations
+- More efficient traversal with parallel processing optimizations
+- Fixed clippy warnings for better code quality (type complexity, unnecessary clones)
+
+### Changed
+
+- Default behavior now uses memory mapping for files larger than 64MB
+- Improved error handling and fallback mechanisms for file reading
+
 ## [0.3.1] - 2025-09-15
 
 ### Fixed

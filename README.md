@@ -362,7 +362,7 @@ Local tips:
 - `ocloc diff --working-tree` compares unstaged working changes to the index.
 - Use `--ext` to limit analysis to specific languages (e.g., `--ext rs,py`).
 - Rename detection is enabled; renamed files are counted with status `R`.
- - JSON includes `base`/`head` refs with short SHAs, plus legacy `base_ref`/`head_ref` strings.
+- JSON includes `base`/`head` refs with short SHAs, plus legacy `base_ref`/`head_ref` strings.
 
 ### Manual Build Commands
 
