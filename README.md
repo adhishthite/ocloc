@@ -73,6 +73,21 @@ Notes:
 
 ## 🚀 Installation
 
+### Cargo (recommended)
+
+Works on macOS, Linux, and Windows with Rust stable ≥ 1.85.
+
+```bash
+cargo install ocloc
+```
+
+Optional: if you prefer downloading a prebuilt binary via cargo, use `cargo-binstall`:
+
+```bash
+cargo install cargo-binstall
+cargo binstall ocloc
+```
+
 ### From Source (GitHub)
 
 ```bash
@@ -85,7 +100,7 @@ cargo run --release -- /path/to/analyze
 
 ### Homebrew (macOS)
 
-Prebuilt binaries are currently published for macOS only (Apple Silicon and Intel).
+You can also install via Homebrew on macOS (Apple Silicon and Intel):
 
 ```bash
 # Add the tap (one-time)
@@ -98,6 +113,25 @@ brew install ocloc
 # brew install adhishthite/ocloc/ocloc
 ```
 
+### Linux
+
+Download the latest `.tar.gz` from Releases, extract, and move the binary into your `PATH`:
+
+```bash
+tar -xzf ocloc-<version>-x86_64-unknown-linux-gnu.tar.gz
+sudo install -m 0755 ocloc /usr/local/bin/ocloc
+ocloc --version
+```
+
+### Windows
+
+Download the latest `.zip` from Releases, extract `ocloc.exe`, and run it or place it somewhere on your `PATH`.
+
+```powershell
+Expand-Archive -Path ocloc-<version>-x86_64-pc-windows-msvc.zip -DestinationPath .
+./ocloc.exe --version
+```
+
 ### Release & Distribute (maintainers)
 
 To publish a new release to crates.io:
@@ -107,13 +141,13 @@ To publish a new release to crates.io:
 3. Tag and push a release: `git tag v0.1.0 && git push origin v0.1.0`.
 4. Publish: `cargo publish` (use `cargo publish --dry-run` first).
 
-GitHub Releases are created automatically when pushing a `v*.*.*` tag. The workflow currently builds macOS artifacts only and attaches:
+GitHub Releases are created automatically when pushing a `v*.*.*` tag. The workflow builds macOS, Linux, and Windows artifacts and attaches:
 
 - `ocloc-<version>-aarch64-apple-darwin.tar.gz`
 - `ocloc-<version>-x86_64-apple-darwin.tar.gz`
-- `SHA256SUMS.txt` (checksums)
-
-Linux and Windows users can build from source for now.
+- `ocloc-<version>-x86_64-unknown-linux-gnu.tar.gz`
+- `ocloc-<version>-x86_64-pc-windows-msvc.zip`
+- `SHA256SUMS.txt` (checksums for all artifacts)
 
 Homebrew tap updates can be automated if you set secrets `TAP_REPO` and `TAP_TOKEN`. The formula will be updated to the latest tag with the correct macOS tarballs and SHA256.
 

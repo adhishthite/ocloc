@@ -65,8 +65,7 @@
 ### CI/Release Notes
 
 - CI builds release binaries and runs fmt/clippy/tests.
-- Release workflow currently publishes macOS tarballs (`aarch64-apple-darwin`, `x86_64-apple-darwin`) and updates a Homebrew tap when configured.
-- Linux/Windows users can build from source until cross-platform artifacts are added.
+- Release workflow publishes macOS (`aarch64-apple-darwin`, `x86_64-apple-darwin`), Linux (`x86_64-unknown-linux-gnu`), and Windows (`x86_64-pc-windows-msvc`) artifacts, and updates a Homebrew tap for macOS when configured.
 
 ## Adding support for a new language
 
