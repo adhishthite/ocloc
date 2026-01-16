@@ -36,6 +36,12 @@
     "block_markers": ["/*", "*/"]
   },
   {
+    "name": "C#",
+    "extensions": ["cs"],
+    "line_markers": ["//"],
+    "block_markers": ["/*", "*/"]
+  },
+  {
     "name": "Java",
     "extensions": ["java"],
     "line_markers": ["//"],
