@@ -1,3 +1,5 @@
+#![allow(clippy::must_use_candidate)]
+
 use once_cell::sync::Lazy;
 use serde::Deserialize;
 use std::collections::HashMap;
@@ -19,6 +21,8 @@ pub struct LanguageRegistry {
     specs: Vec<LanguageSpec>,
     by_ext: HashMap<String, usize>,
     by_special: HashMap<String, usize>,
+    // Extensions with multiple claimants (for content-based detection)
+    conflicting_exts: HashMap<String, Vec<usize>>,
     // Precomputed bytes per language index for fast access
     line_markers_bytes: Vec<Vec<Vec<u8>>>,
     block_markers_bytes: Vec<Option<(Vec<u8>, Vec<u8>)>>,
@@ -28,11 +32,14 @@ impl LanguageRegistry {
     fn from_specs(specs: Vec<LanguageSpec>) -> Self {
         let mut by_ext = HashMap::new();
         let mut by_special = HashMap::new();
+        let mut ext_claimants: HashMap<String, Vec<usize>> = HashMap::new();
         let mut line_markers_bytes = Vec::with_capacity(specs.len());
         let mut block_markers_bytes = Vec::with_capacity(specs.len());
+
         for (i, spec) in specs.iter().enumerate() {
             for ext in &spec.extensions {
-                by_ext.insert(ext.to_ascii_lowercase(), i);
+                let ext_lower = ext.to_ascii_lowercase();
+                ext_claimants.entry(ext_lower.clone()).or_default().push(i);
             }
             for name in &spec.special_filenames {
                 by_special.insert(name.to_ascii_lowercase(), i);
@@ -49,10 +56,22 @@ impl LanguageRegistry {
                     .map(|(a, b)| (a.as_bytes().to_vec(), b.as_bytes().to_vec())),
             );
         }
+
+        // Separate conflicting extensions from unique ones
+        let mut conflicting_exts = HashMap::new();
+        for (ext, claimants) in ext_claimants {
+            if claimants.len() == 1 {
+                by_ext.insert(ext, claimants[0]);
+            } else {
+                conflicting_exts.insert(ext, claimants);
+            }
+        }
+
         Self {
             specs,
             by_ext,
             by_special,
+            conflicting_exts,
             line_markers_bytes,
             block_markers_bytes,
         }
@@ -89,8 +108,19 @@ pub fn find_language_for_path(path: &Path) -> Option<&'static str> {
     // 2) By extension
     if let Some(ext) = path.extension().and_then(|s| s.to_str()) {
         let ext = ext.to_ascii_lowercase();
+
+        // Check for non-conflicting extension
         if let Some(&idx) = REGISTRY.by_ext.get(&ext) {
             return Some(&language_registry()[idx].name);
+        }
+
+        // Check for conflicting extension - use content-based detection
+        if let Some(candidates) = REGISTRY.conflicting_exts.get(&ext) {
+            if let Some(detected) = detect_language_by_content(path, candidates) {
+                return Some(&language_registry()[detected].name);
+            }
+            // Fallback to first candidate if detection fails
+            return Some(&language_registry()[candidates[0]].name);
         }
     }
 
@@ -128,8 +158,19 @@ pub fn find_language_index_for_path(path: &Path) -> Option<usize> {
     }
     if let Some(ext) = path.extension().and_then(|s| s.to_str()) {
         let ext = ext.to_ascii_lowercase();
+
+        // Check for non-conflicting extension
         if let Some(&idx) = REGISTRY.by_ext.get(&ext) {
             return Some(idx);
+        }
+
+        // Check for conflicting extension - use content-based detection
+        if let Some(candidates) = REGISTRY.conflicting_exts.get(&ext) {
+            if let Some(detected) = detect_language_by_content(path, candidates) {
+                return Some(detected);
+            }
+            // Fallback to first candidate
+            return Some(candidates[0]);
         }
     }
     if path.extension().is_none()
@@ -154,6 +195,274 @@ pub fn language_markers_bytes(idx: usize) -> LanguageMarkersBytes {
         .as_ref()
         .map(|(a, b)| (a.as_slice(), b.as_slice()));
     (lines, blocks)
+}
+
+/// Content-based language detection for ambiguous extensions
+fn detect_language_by_content(path: &Path, candidates: &[usize]) -> Option<usize> {
+    // Read first few lines of the file
+    let file = File::open(path).ok()?;
+    let reader = BufReader::new(file);
+    let lines: Vec<String> = reader
+        .lines()
+        .take(50)  // Sample first 50 lines
+        .filter_map(Result::ok)
+        .collect();
+
+    if lines.is_empty() {
+        return None;
+    }
+
+    let content = lines.join("\n");
+    let content_lower = content.to_lowercase();
+
+    let ext = path.extension()?.to_str()?.to_ascii_lowercase();
+
+    // Specific heuristics based on extension
+    match ext.as_str() {
+        "m" => detect_m_language(&content, &content_lower, candidates),
+        "v" => detect_v_language(&content, &content_lower, candidates),
+        "cl" => detect_cl_language(&content, &content_lower, candidates),
+        "pp" => detect_pp_language(&content, &content_lower, candidates),
+        "il" => detect_il_language(&content, &content_lower, candidates),
+        "cj" => detect_cj_language(&content, &content_lower, candidates),
+        _ => None,
+    }
+}
+
+/// Detect .m files: Objective-C, MATLAB, Octave, Mercury
+fn detect_m_language(content: &str, content_lower: &str, candidates: &[usize]) -> Option<usize> {
+    let specs = &REGISTRY.specs;
+
+    // Objective-C indicators (strongest signals first)
+    if content.contains("@interface")
+        || content.contains("@implementation")
+        || content.contains("@protocol")
+        || content.contains("@property")
+        || content.contains("#import")
+        || content.contains("NSObject")
+        || content.contains("NS_ASSUME")
+    {
+        return candidates
+            .iter()
+            .find(|&&idx| specs[idx].name == "Objective-C")
+            .copied();
+    }
+
+    // Mercury indicators
+    if content.contains(":- module")
+        || content.contains(":- interface")
+        || content.contains(":- implementation")
+        || content.contains(":- pred ")
+        || content.contains(":- func ")
+    {
+        return candidates
+            .iter()
+            .find(|&&idx| specs[idx].name == "Mercury")
+            .copied();
+    }
+
+    // MATLAB/Octave indicators
+    if content.contains("function ")
+        && (content.contains("end\n") || content.contains("end\r") || content_lower.contains("end;"))
+        || content.contains("% ")
+        || content_lower.contains("fprintf")
+        || content_lower.contains("disp(")
+        || content_lower.contains("plot(")
+    {
+        // Prefer MATLAB over Octave as it's more common
+        if let Some(&idx) = candidates.iter().find(|&&idx| specs[idx].name == "MATLAB") {
+            return Some(idx);
+        }
+        return candidates
+            .iter()
+            .find(|&&idx| specs[idx].name == "Octave")
+            .copied();
+    }
+
+    // Default to Objective-C if uncertain (most common in modern codebases)
+    candidates
+        .iter()
+        .find(|&&idx| specs[idx].name == "Objective-C")
+        .copied()
+}
+
+/// Detect .v files: Verilog vs Coq
+fn detect_v_language(content: &str, _content_lower: &str, candidates: &[usize]) -> Option<usize> {
+    let specs = &REGISTRY.specs;
+
+    // Coq indicators
+    if content.contains("Theorem ")
+        || content.contains("Proof.")
+        || content.contains("Qed.")
+        || content.contains("Lemma ")
+        || content.contains("Definition ")
+        || content.contains("Require ")
+    {
+        return candidates
+            .iter()
+            .find(|&&idx| specs[idx].name == "Coq")
+            .copied();
+    }
+
+    // Verilog indicators
+    if content.contains("module ")
+        || content.contains("endmodule")
+        || content.contains("wire ")
+        || content.contains("reg ")
+        || content.contains("always @")
+    {
+        return candidates
+            .iter()
+            .find(|&&idx| specs[idx].name.contains("Verilog"))
+            .copied();
+    }
+
+    // Default to Verilog (more common)
+    candidates
+        .iter()
+        .find(|&&idx| specs[idx].name.contains("Verilog"))
+        .copied()
+}
+
+#[allow(clippy::doc_markdown)]
+/// Detect .cl files: OpenCL vs Lisp
+fn detect_cl_language(content: &str, _content_lower: &str, candidates: &[usize]) -> Option<usize> {
+    let specs = &REGISTRY.specs;
+
+    // Lisp indicators
+    if content.contains("(defun ")
+        || content.contains("(defmacro ")
+        || content.contains("(setq ")
+        || content.trim_start().starts_with('(')
+    {
+        return candidates
+            .iter()
+            .find(|&&idx| specs[idx].name == "Lisp")
+            .copied();
+    }
+
+    // OpenCL indicators
+    if content.contains("__kernel")
+        || content.contains("__global")
+        || content.contains("get_global_id")
+        || content.contains("cl_")
+    {
+        return candidates
+            .iter()
+            .find(|&&idx| specs[idx].name == "OpenCL")
+            .copied();
+    }
+
+    // Default to OpenCL
+    candidates
+        .iter()
+        .find(|&&idx| specs[idx].name == "OpenCL")
+        .copied()
+}
+
+/// Detect .pp files: Puppet vs Pascal
+fn detect_pp_language(content: &str, _content_lower: &str, candidates: &[usize]) -> Option<usize> {
+    let specs = &REGISTRY.specs;
+
+    // Puppet indicators
+    if content.contains("class ")
+        && (content.contains("=>") || content.contains("node ") || content.contains("define "))
+        || content.contains("include ")
+        || content.contains("$::")
+    {
+        return candidates
+            .iter()
+            .find(|&&idx| specs[idx].name == "Puppet")
+            .copied();
+    }
+
+    // Pascal indicators
+    if content.contains("program ")
+        || content.contains("procedure ")
+        || content.contains("function ")
+        && (content.contains("begin") || content.contains("Begin"))
+        || content.contains("uses ")
+    {
+        return candidates
+            .iter()
+            .find(|&&idx| specs[idx].name == "Pascal")
+            .copied();
+    }
+
+    // Default to Puppet (more common in modern dev)
+    candidates
+        .iter()
+        .find(|&&idx| specs[idx].name == "Puppet")
+        .copied()
+}
+
+/// Detect .il files: SKILL vs .NET IL
+fn detect_il_language(content: &str, _content_lower: &str, candidates: &[usize]) -> Option<usize> {
+    let specs = &REGISTRY.specs;
+
+    // .NET IL indicators
+    if content.contains(".assembly")
+        || content.contains(".class")
+        || content.contains(".method")
+        || content.contains("IL_")
+    {
+        return candidates
+            .iter()
+            .find(|&&idx| specs[idx].name == ".NET IL")
+            .copied();
+    }
+
+    // SKILL indicators (Cadence)
+    if content.contains("procedure(")
+        || content.contains("defun(")
+        || content.trim_start().starts_with(';')
+    {
+        return candidates
+            .iter()
+            .find(|&&idx| specs[idx].name == "SKILL")
+            .copied();
+    }
+
+    // Default to .NET IL
+    candidates
+        .iter()
+        .find(|&&idx| specs[idx].name == ".NET IL")
+        .copied()
+}
+
+/// Detect .cj files: Cangjie vs Clojure
+fn detect_cj_language(content: &str, _content_lower: &str, candidates: &[usize]) -> Option<usize> {
+    let specs = &REGISTRY.specs;
+
+    // Clojure indicators
+    if content.contains("(ns ")
+        || content.contains("(def ")
+        || content.contains("(defn ")
+        || content.trim_start().starts_with('(')
+    {
+        return candidates
+            .iter()
+            .find(|&&idx| specs[idx].name == "Clojure")
+            .copied();
+    }
+
+    // Cangjie indicators (assume C-like syntax)
+    if content.contains("import ")
+        || content.contains("package ")
+        || content.contains("class ")
+        || content.contains("func ")
+    {
+        return candidates
+            .iter()
+            .find(|&&idx| specs[idx].name == "Cangjie")
+            .copied();
+    }
+
+    // Default to Cangjie
+    candidates
+        .iter()
+        .find(|&&idx| specs[idx].name == "Cangjie")
+        .copied()
 }
 
 fn parse_shebang(line: &str) -> Option<&'static str> {
@@ -210,8 +519,8 @@ mod tests {
         let dir = tempdir().unwrap();
         let jsx = dir.path().join("a.jsx");
         let tsx = dir.path().join("b.tsx");
-        std::fs::File::create(&jsx).unwrap();
-        std::fs::File::create(&tsx).unwrap();
+        File::create(&jsx).unwrap();
+        File::create(&tsx).unwrap();
         assert_eq!(find_language_for_path(&jsx), Some("JavaScript"));
         assert_eq!(find_language_for_path(&tsx), Some("TypeScript"));
     }
@@ -221,8 +530,8 @@ mod tests {
         let dir = tempdir().unwrap();
         let mk = dir.path().join("Makefile");
         let dk = dir.path().join("Dockerfile");
-        std::fs::File::create(&mk).unwrap();
-        std::fs::File::create(&dk).unwrap();
+        File::create(&mk).unwrap();
+        File::create(&dk).unwrap();
         assert_eq!(find_language_for_path(&mk), Some("Make"));
         assert_eq!(find_language_for_path(&dk), Some("Dockerfile"));
     }
@@ -233,11 +542,11 @@ mod tests {
         let py = dir.path().join("script");
         let sh = dir.path().join("run");
         {
-            let mut f = std::fs::File::create(&py).unwrap();
+            let mut f = File::create(&py).unwrap();
             writeln!(f, "#!/usr/bin/env python3\nprint(123)").unwrap();
         }
         {
-            let mut f = std::fs::File::create(&sh).unwrap();
+            let mut f = File::create(&sh).unwrap();
             writeln!(f, "#!/bin/bash\necho hi").unwrap();
         }
         assert_eq!(find_language_for_path(&py), Some("Python"));
@@ -255,14 +564,14 @@ mod tests {
         let rst = dir.path().join("guide.rst");
         let adoc = dir.path().join("handbook.adoc");
         let xml = dir.path().join("data.xml");
-        std::fs::File::create(&md).unwrap();
-        std::fs::File::create(&mdx).unwrap();
-        std::fs::File::create(&svg).unwrap();
-        std::fs::File::create(&ini).unwrap();
-        std::fs::File::create(&txt).unwrap();
-        std::fs::File::create(&rst).unwrap();
-        std::fs::File::create(&adoc).unwrap();
-        std::fs::File::create(&xml).unwrap();
+        File::create(&md).unwrap();
+        File::create(&mdx).unwrap();
+        File::create(&svg).unwrap();
+        File::create(&ini).unwrap();
+        File::create(&txt).unwrap();
+        File::create(&rst).unwrap();
+        File::create(&adoc).unwrap();
+        File::create(&xml).unwrap();
         assert_eq!(find_language_for_path(&md), Some("Markdown"));
         assert_eq!(find_language_for_path(&mdx), Some("Markdown"));
         assert_eq!(find_language_for_path(&svg), Some("SVG"));
@@ -284,14 +593,14 @@ mod tests {
         let gem = dir.path().join("Gemfile");
         let just = dir.path().join("justfile");
         let readme = dir.path().join("README");
-        std::fs::File::create(&make).unwrap();
-        std::fs::File::create(&dk).unwrap();
-        std::fs::File::create(&cm).unwrap();
-        std::fs::File::create(&build).unwrap();
-        std::fs::File::create(&ws).unwrap();
-        std::fs::File::create(&gem).unwrap();
-        std::fs::File::create(&just).unwrap();
-        std::fs::File::create(&readme).unwrap();
+        File::create(&make).unwrap();
+        File::create(&dk).unwrap();
+        File::create(&cm).unwrap();
+        File::create(&build).unwrap();
+        File::create(&ws).unwrap();
+        File::create(&gem).unwrap();
+        File::create(&just).unwrap();
+        File::create(&readme).unwrap();
         assert_eq!(find_language_for_path(&make), Some("Make"));
         assert_eq!(find_language_for_path(&dk), Some("Dockerfile"));
         assert_eq!(find_language_for_path(&cm), Some("CMake"));
@@ -304,30 +613,32 @@ mod tests {
 
     #[test]
     fn languages_json_is_consistent() {
-        use std::collections::HashSet;
+        use std::collections::{HashMap, HashSet};
         let specs = language_registry();
         let mut names = HashSet::new();
-        let mut exts = HashSet::new();
+        let mut ext_counts: HashMap<String, Vec<&str>> = HashMap::new();
         let mut specials = HashSet::new();
+
+        // Known acceptable conflicts (handled by content-based detection or are related variants)
+        let acceptable_conflicts = ["m", "v", "cl", "pp", "il", "ils", "cj"];
+
         for s in specs {
             assert!(!s.name.trim().is_empty(), "language name must be non-empty");
             assert!(names.insert(&s.name), "duplicate language name: {}", s.name);
+
             for e in &s.extensions {
                 let norm = e.to_ascii_lowercase();
-                assert!(
-                    exts.insert(norm.clone()),
-                    "duplicate extension across languages: {}",
-                    norm
-                );
+                ext_counts.entry(norm).or_default().push(&s.name);
             }
+
             for f in &s.special_filenames {
                 let norm = f.to_ascii_lowercase();
                 assert!(
                     specials.insert(norm.clone()),
-                    "duplicate special filename across languages: {}",
-                    norm
+                    "duplicate special filename across languages: {norm}"
                 );
             }
+
             if let Some((ref a, ref b)) = s.block_markers {
                 assert!(
                     !a.is_empty() && !b.is_empty(),
@@ -335,6 +646,13 @@ mod tests {
                     s.name
                 );
             }
+        }
+
+        // Check for unexpected conflicts
+        for (ext, langs) in ext_counts {
+            assert!(langs.len() <= 1 || acceptable_conflicts.contains(&ext.as_str()),
+                "Unexpected extension conflict: .{ext} claimed by: {langs:?}"
+            );
         }
     }
 }

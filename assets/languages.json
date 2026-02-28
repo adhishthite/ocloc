@@ -1,74 +1,3483 @@
 [
   {
-    "name": "Rust",
-    "extensions": ["rs"],
-    "line_markers": ["//"],
-    "block_markers": ["/*", "*/"]
+    "name": ".NET IL",
+    "extensions": [
+      "il"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
   },
   {
-    "name": "Python",
-    "extensions": ["py"],
-    "line_markers": ["#"],
+    "name": "ABAP",
+    "extensions": [
+      "abap"
+    ],
+    "line_markers": [
+      "\\*"
+    ],
     "block_markers": null
   },
   {
-    "name": "JavaScript",
-    "extensions": ["js", "jsx"],
-    "line_markers": ["//"],
-    "block_markers": ["/*", "*/"]
+    "name": "AMPLE",
+    "extensions": [
+      "ample",
+      "dofile",
+      "startup"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": null
   },
   {
-    "name": "TypeScript",
-    "extensions": ["ts", "tsx"],
-    "line_markers": ["//"],
-    "block_markers": ["/*", "*/"]
+    "name": "ANTLR Grammar",
+    "extensions": [
+      "g",
+      "g4"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "APL",
+    "extensions": [
+      "apl",
+      "apla",
+      "aplc",
+      "aplf",
+      "apli",
+      "apln",
+      "aplo",
+      "dyalog",
+      "dyapp",
+      "mipage"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "ASP",
+    "extensions": [
+      "asa",
+      "ashx",
+      "asp",
+      "axd"
+    ],
+    "line_markers": [
+      "'"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "ASP.NET",
+    "extensions": [
+      "asax",
+      "ascx",
+      "asmx",
+      "aspx",
+      "master",
+      "sitemap",
+      "webinfo"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "AXAML",
+    "extensions": [
+      "axaml"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "ActionScript",
+    "extensions": [
+      "as"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Activiti Business Process",
+    "extensions": [
+      "bpmn"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Ada",
+    "extensions": [
+      "ada",
+      "adb",
+      "ads",
+      "pad"
+    ],
+    "line_markers": [
+      "--"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Agda",
+    "extensions": [
+      "agda",
+      "lagda"
+    ],
+    "line_markers": [
+      "--"
+    ],
+    "block_markers": [
+      "{-",
+      "-}"
+    ]
+  },
+  {
+    "name": "AnsProlog",
+    "extensions": [
+      "lp"
+    ],
+    "line_markers": [
+      "%",
+      "//"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Ant",
+    "extensions": [
+      "build.xml"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Apex Class",
+    "extensions": [
+      "cls"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Apex Trigger",
+    "extensions": [
+      "trigger"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "AppleScript",
+    "extensions": [
+      "applescript"
+    ],
+    "line_markers": [
+      "--"
+    ],
+    "block_markers": [
+      "(*",
+      "*)"
+    ]
+  },
+  {
+    "name": "Arduino",
+    "extensions": [
+      "ino"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Aria",
+    "extensions": [
+      "aria"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "ArkTs",
+    "extensions": [
+      "ets"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Arturo",
+    "extensions": [
+      "art"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "AsciiDoc",
+    "extensions": [
+      "adoc",
+      "asciidoc"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "AspectJ",
+    "extensions": [
+      "aj"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Assembly",
+    "extensions": [
+      "S",
+      "a51",
+      "asm",
+      "nasm"
+    ],
+    "line_markers": [
+      "#",
+      "--",
+      "//",
+      ";",
+      "\\*"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Astro",
+    "extensions": [
+      "astro"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Asymptote",
+    "extensions": [
+      "asy"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "AutoHotkey",
+    "extensions": [
+      "ahk",
+      "ahkl"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Bash",
+    "extensions": [
+      "bash"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Beluga",
+    "extensions": [
+      "bel"
+    ],
+    "line_markers": [
+      "%"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Bicep",
+    "extensions": [
+      "bicep",
+      "bicepparam"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "BitBake",
+    "extensions": [
+      "bb",
+      "bbappend",
+      "bbclass"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "BizTalk Orchestration",
+    "extensions": [
+      "odx"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "BizTalk Pipeline",
+    "extensions": [
+      "btp"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Blade",
+    "extensions": [
+      "blade",
+      "blade.php"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Blueprint",
+    "extensions": [
+      "blp"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "BrightScript",
+    "extensions": [
+      "brs"
+    ],
+    "line_markers": [
+      "'"
+    ],
+    "block_markers": null
   },
   {
     "name": "C",
-    "extensions": ["c", "h"],
-    "line_markers": ["//"],
-    "block_markers": ["/*", "*/"]
-  },
-  {
-    "name": "C++",
-    "extensions": ["cpp", "cc", "hpp", "hh"],
-    "line_markers": ["//"],
-    "block_markers": ["/*", "*/"]
+    "extensions": [
+      "c",
+      "h",
+      "cats",
+      "ec",
+      "idc",
+      "pgc"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
   },
   {
     "name": "C#",
-    "extensions": ["cs"],
-    "line_markers": ["//"],
-    "block_markers": ["/*", "*/"]
+    "extensions": [
+      "cs"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
   },
   {
-    "name": "Java",
-    "extensions": ["java"],
-    "line_markers": ["//"],
-    "block_markers": ["/*", "*/"]
+    "name": "C++",
+    "extensions": [
+      "cpp",
+      "cc",
+      "hpp",
+      "hh",
+      "c++",
+      "c++m",
+      "ccm",
+      "cppm",
+      "cxx",
+      "cxxm",
+      "h++",
+      "inl",
+      "ipp",
+      "ixx",
+      "pcc",
+      "tcc",
+      "tpp"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "C/C++ Header",
+    "extensions": [
+      "hxx"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "C3",
+    "extensions": [
+      "c3",
+      "c3i",
+      "c3t"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "CCS",
+    "extensions": [
+      "ccs"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "CMake",
+    "extensions": [
+      "cmake",
+      "cmake.in"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null,
+    "special_filenames": [
+      "cmakelists.txt"
+    ]
+  },
+  {
+    "name": "COBOL",
+    "extensions": [
+      "CBL",
+      "COB",
+      "ccp",
+      "cobol",
+      "cpy"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "CSON",
+    "extensions": [
+      "cson"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "CSS",
+    "extensions": [
+      "css"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "CSV",
+    "extensions": [
+      "csv"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "CUDA",
+    "extensions": [
+      "cu",
+      "cuh"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Cadence",
+    "extensions": [
+      "cdc"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Cairo",
+    "extensions": [
+      "cairo"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Cake Build Script",
+    "extensions": [
+      "cake"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Cangjie",
+    "extensions": [
+      "cj"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Carbon",
+    "extensions": [
+      "carbon"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Chapel",
+    "extensions": [
+      "chpl"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Circom",
+    "extensions": [
+      "circom"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Civet",
+    "extensions": [
+      "civet",
+      "cvt",
+      "cvtx"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "Clarity",
+    "extensions": [
+      "clar"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Clean",
+    "extensions": [
+      "dcl",
+      "icl"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Clojure",
+    "extensions": [
+      "boot",
+      "cl2",
+      "clj",
+      "cljs.hl",
+      "cljscm",
+      "cljx",
+      "hic",
+      "riemann.config"
+    ],
+    "line_markers": [
+      "#",
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "ClojureC",
+    "extensions": [
+      "cljc"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "ClojureScript",
+    "extensions": [
+      "cljs"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "CoCoA 5",
+    "extensions": [
+      "c5",
+      "cocoa5",
+      "cocoa5server",
+      "cpkg5"
+    ],
+    "line_markers": [
+      "--",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "CoffeeScript",
+    "extensions": [
+      "_coffee",
+      "cakefile",
+      "cjsx",
+      "coffee",
+      "iced"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "ColdFusion",
+    "extensions": [
+      "cfm",
+      "cfml"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "ColdFusion CFScript",
+    "extensions": [
+      "cfc"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Constraint Grammar",
+    "extensions": [
+      "cg3",
+      "rlx"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Containerfile",
+    "extensions": [],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null,
+    "special_filenames": [
+      "containerfile"
+    ]
+  },
+  {
+    "name": "Coq",
+    "extensions": [
+      "v"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "(*",
+      "*)"
+    ]
+  },
+  {
+    "name": "Crystal",
+    "extensions": [
+      "cr"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Cucumber",
+    "extensions": [
+      "feature"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Cython",
+    "extensions": [
+      "pxd",
+      "pxi",
+      "pyx"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "D",
+    "extensions": [
+      "d"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "DAL",
+    "extensions": [
+      "da"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "DAML",
+    "extensions": [
+      "daml"
+    ],
+    "line_markers": [
+      "--"
+    ],
+    "block_markers": [
+      "{-",
+      "-}"
+    ]
+  },
+  {
+    "name": "DIET",
+    "extensions": [
+      "dt"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "DITA",
+    "extensions": [
+      "dita"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "DOORS Extension Language",
+    "extensions": [
+      "dxl"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "DOS Batch",
+    "extensions": [
+      "BAT",
+      "BTM",
+      "CMD"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "DTD",
+    "extensions": [
+      "dtd"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Dafny",
+    "extensions": [
+      "dfy"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Dart",
+    "extensions": [
+      "dart"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Delphi Form",
+    "extensions": [
+      "dfm"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "(*",
+      "*)"
+    ]
+  },
+  {
+    "name": "DenizenScript",
+    "extensions": [
+      "dsc"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Derw",
+    "extensions": [
+      "derw"
+    ],
+    "line_markers": [
+      "--"
+    ],
+    "block_markers": [
+      "{-",
+      "-}"
+    ]
+  },
+  {
+    "name": "Dockerfile",
+    "extensions": [],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null,
+    "special_filenames": [
+      "dockerfile",
+      "dockerfile.cmake",
+      "dockerfile.m4"
+    ]
+  },
+  {
+    "name": "Drools",
+    "extensions": [
+      "drl"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "ECPP",
+    "extensions": [
+      "ecpp"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "EEx",
+    "extensions": [
+      "eex"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "EJS",
+    "extensions": [
+      "ejs"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "ERB",
+    "extensions": [
+      "ERB"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "Elixir",
+    "extensions": [
+      "ex"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Elm",
+    "extensions": [
+      "elm"
+    ],
+    "line_markers": [
+      "--"
+    ],
+    "block_markers": [
+      "{-",
+      "-}"
+    ]
+  },
+  {
+    "name": "Embedded Crystal",
+    "extensions": [
+      "ecr"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "Erlang",
+    "extensions": [
+      "app.src",
+      "emakefile",
+      "erl",
+      "hrl",
+      "rebar.config",
+      "rebar.config.lock",
+      "rebar.lock",
+      "xrl",
+      "yrl"
+    ],
+    "line_markers": [
+      "%"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Expect",
+    "extensions": [
+      "exp"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "F#",
+    "extensions": [
+      "fsi"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "(*",
+      "*)"
+    ]
+  },
+  {
+    "name": "FXML",
+    "extensions": [
+      "fxml"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Fennel",
+    "extensions": [
+      "fnl"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Finite State Language",
+    "extensions": [
+      "fsl",
+      "jssm"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Fish Shell",
+    "extensions": [
+      "fish"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Flatbuffers",
+    "extensions": [
+      "fbs"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Focus",
+    "extensions": [
+      "focexec"
+    ],
+    "line_markers": [
+      "\\*"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Forth",
+    "extensions": [
+      "4th",
+      "e4",
+      "f83",
+      "fb",
+      "forth",
+      "fpm",
+      "fr",
+      "frt",
+      "ft",
+      "fth",
+      "rx"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Fortran 2003",
+    "extensions": [
+      "F03"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "Fortran 77",
+    "extensions": [
+      "F",
+      "F77",
+      "FOR",
+      "FTN",
+      "pfo"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "Fortran 90",
+    "extensions": [
+      "F90"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "Fortran 95",
+    "extensions": [
+      "F95"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "Freemarker Template",
+    "extensions": [
+      "ftl"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "Futhark",
+    "extensions": [
+      "fut"
+    ],
+    "line_markers": [
+      "--"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "GDScript",
+    "extensions": [
+      "gd"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "GLSL",
+    "extensions": [
+      "comp",
+      "fp",
+      "frag",
+      "frg",
+      "fsh",
+      "fshader",
+      "geo",
+      "geom",
+      "glsl",
+      "glslv",
+      "gshader",
+      "tesc",
+      "tese",
+      "vert",
+      "vrx",
+      "vsh",
+      "vshader"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Gencat NLS",
+    "extensions": [
+      "msg"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "Glade",
+    "extensions": [
+      "glade"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Gleam",
+    "extensions": [
+      "gleam"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Glimmer JavaScript",
+    "extensions": [
+      "gjs"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Glimmer TypeScript",
+    "extensions": [
+      "gts"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
   },
   {
     "name": "Go",
-    "extensions": ["go"],
-    "line_markers": ["//"],
-    "block_markers": ["/*", "*/"]
+    "extensions": [
+      "go",
+      "\u0295\u25d4\u03d6\u25d4\u0294"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
   },
   {
-    "name": "Shell",
-    "extensions": ["sh"],
-    "line_markers": ["#"],
+    "name": "Godot Resource",
+    "extensions": [
+      "tres"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Godot Scene",
+    "extensions": [
+      "tscn"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Godot Shaders",
+    "extensions": [
+      "gdshader"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Gradle",
+    "extensions": [
+      "gradle",
+      "gradle.kts"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Grails",
+    "extensions": [
+      "gsp"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "GraphQL",
+    "extensions": [
+      "gql",
+      "graphql",
+      "graphqls"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Groovy",
+    "extensions": [
+      "gant",
+      "groovy",
+      "grt",
+      "gtpl",
+      "gvy"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ],
+    "special_filenames": [
+      "jenkinsfile"
+    ]
+  },
+  {
+    "name": "HCL",
+    "extensions": [
+      "hcl",
+      "nomad",
+      "tf",
+      "tfvars"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "HLSL",
+    "extensions": [
+      "cg",
+      "cginc",
+      "fxh",
+      "hlsl",
+      "hlsli",
+      "shader"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "HTML",
+    "extensions": [
+      "html",
+      "htm",
+      "html.hl",
+      "xht"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "HTML EEx",
+    "extensions": [
+      "heex"
+    ],
+    "line_markers": [
+      "#",
+      "%"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Haml",
+    "extensions": [
+      "haml",
+      "haml.deface"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Handlebars",
+    "extensions": [
+      "handlebars",
+      "hbs"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Harbour",
+    "extensions": [
+      "hb"
+    ],
+    "line_markers": [
+      "//",
+      "\\*"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Hare",
+    "extensions": [
+      "ha"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Haskell",
+    "extensions": [
+      "hs",
+      "hsc",
+      "lhs"
+    ],
+    "line_markers": [
+      "--"
+    ],
+    "block_markers": [
+      "{-",
+      "-}"
+    ]
+  },
+  {
+    "name": "Haskell Boot",
+    "extensions": [
+      "hs-boot",
+      "lhs-boot"
+    ],
+    "line_markers": [
+      "--"
+    ],
+    "block_markers": [
+      "{-",
+      "-}"
+    ]
+  },
+  {
+    "name": "Haxe",
+    "extensions": [
+      "hx",
+      "hxsl"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Hibernate",
+    "extensions": [
+      "hbm.xml"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "HolyC",
+    "extensions": [
+      "HC"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Hoon",
+    "extensions": [
+      "hoon"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "IDL",
+    "extensions": [
+      "dlm",
+      "idl"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "INI",
+    "extensions": [
+      "ini",
+      "cfg",
+      "conf",
+      "properties",
+      "buildozer.spec",
+      "editorconfig",
+      "lektorproject",
+      "prefs"
+    ],
+    "line_markers": [
+      ";",
+      "#"
+    ],
+    "block_markers": null,
+    "special_filenames": [
+      ".editorconfig",
+      ".env",
+      ".envrc"
+    ]
+  },
+  {
+    "name": "IPL",
+    "extensions": [
+      "ipl"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Idris",
+    "extensions": [
+      "idr"
+    ],
+    "line_markers": [
+      "--"
+    ],
+    "block_markers": [
+      "{-",
+      "-}"
+    ]
+  },
+  {
+    "name": "Igor Pro",
+    "extensions": [
+      "ipf"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Imba",
+    "extensions": [
+      "imba"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "InstallShield",
+    "extensions": [
+      "ism"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "JCL",
+    "extensions": [
+      "jcl"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "JSON",
+    "extensions": [
+      "json",
+      "arcconfig",
+      "avsc",
+      "composer.lock",
+      "geojson",
+      "gltf",
+      "har",
+      "htmlhintrc",
+      "json-tmlanguage",
+      "jsonl",
+      "mcmeta",
+      "mcmod.info",
+      "tern-config",
+      "tern-project",
+      "tfstate",
+      "tfstate.backup",
+      "topojson",
+      "watchmanconfig",
+      "webapp",
+      "webmanifest",
+      "yyp"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "JSON5",
+    "extensions": [
+      "json5"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "JSP",
+    "extensions": [
+      "jsp",
+      "jspf"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "JSP Tag Library Definition",
+    "extensions": [
+      "tld"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "JSX",
+    "extensions": [],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Jai",
+    "extensions": [
+      "jai"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Jam",
+    "extensions": [],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null,
+    "special_filenames": [
+      "jamfile",
+      "jamrules"
+    ]
+  },
+  {
+    "name": "Janet",
+    "extensions": [
+      "janet"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Jasper Report XML/Template",
+    "extensions": [
+      "jrxml"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Java",
+    "extensions": [
+      "java"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "JavaScript",
+    "extensions": [
+      "js",
+      "jsx",
+      "_js",
+      "bones",
+      "cjs",
+      "es6",
+      "jake",
+      "jakefile",
+      "jsb",
+      "jscad",
+      "jsfl",
+      "jsm",
+      "jss",
+      "mjs",
+      "njs",
+      "pac",
+      "sjs",
+      "ssjs",
+      "xsjs",
+      "xsjslib"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "JavaServer Faces",
+    "extensions": [
+      "jsf"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Jinja Template",
+    "extensions": [
+      "j2",
+      "jinja",
+      "jinja2"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "Jsonnet",
+    "extensions": [
+      "jsonnet"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Julia",
+    "extensions": [
+      "jl"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": [
+      "#=",
+      "=#"
+    ]
+  },
+  {
+    "name": "Juniper Junos",
+    "extensions": [
+      "junos"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Jupyter",
+    "extensions": [
+      "ipynb"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "Just",
+    "extensions": [
+      "just"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null,
+    "special_filenames": [
+      "justfile"
+    ]
+  },
+  {
+    "name": "Kermit",
+    "extensions": [
+      "ksc"
+    ],
+    "line_markers": [
+      "#",
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Kotlin",
+    "extensions": [
+      "kt",
+      "ktm",
+      "kts"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "LESS",
+    "extensions": [
+      "less"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "LFE",
+    "extensions": [
+      "lfe"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "LLVM IR",
+    "extensions": [
+      "ll"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "LaTeX",
+    "extensions": [
+      "aux",
+      "bbx",
+      "bib",
+      "bst",
+      "cbx",
+      "dtx",
+      "ins",
+      "lbx",
+      "ltx",
+      "mkii",
+      "mkiv",
+      "mkvi",
+      "sty",
+      "tex"
+    ],
+    "line_markers": [
+      "%"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Lean",
+    "extensions": [
+      "hlean",
+      "lean"
+    ],
+    "line_markers": [
+      "--"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Lem",
+    "extensions": [
+      "lem"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "Linker Script",
+    "extensions": [
+      "ld"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Liquibase",
+    "extensions": [
+      "lb.xml"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Lisp",
+    "extensions": [
+      "asd",
+      "el",
+      "lisp",
+      "lsp"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Literate Idris",
+    "extensions": [
+      "lidr"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "LiveLink OScript",
+    "extensions": [
+      "oscript"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Logos",
+    "extensions": [
+      "x",
+      "xm"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Logtalk",
+    "extensions": [
+      "lgt",
+      "logtalk"
+    ],
+    "line_markers": [
+      "%",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Lua",
+    "extensions": [
+      "lua",
+      "nse",
+      "p8",
+      "pd_lua",
+      "rbxs",
+      "wlua"
+    ],
+    "line_markers": [
+      "--"
+    ],
+    "block_markers": [
+      "--[[",
+      "]]"
+    ]
+  },
+  {
+    "name": "Luau",
+    "extensions": [
+      "luau"
+    ],
+    "line_markers": [
+      "--"
+    ],
+    "block_markers": [
+      "--[[",
+      "]]"
+    ]
+  },
+  {
+    "name": "MATLAB",
+    "extensions": [
+      "m"
+    ],
+    "line_markers": [
+      "%"
+    ],
+    "block_markers": [
+      "%{",
+      "%}"
+    ]
+  },
+  {
+    "name": "MSBuild script",
+    "extensions": [
+      "btproj",
+      "csproj",
+      "msbuild",
+      "vcproj",
+      "wdproj",
+      "wixproj"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "MUMPS",
+    "extensions": [
+      "mps"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "MXML",
+    "extensions": [
+      "mxml"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Magik",
+    "extensions": [
+      "magik"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Make",
+    "extensions": [
+      "am",
+      "mk"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null,
+    "special_filenames": [
+      "makefile",
+      "gnumakefile"
+    ]
+  },
+  {
+    "name": "Mako",
+    "extensions": [
+      "mako",
+      "mao"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Markdown",
+    "extensions": [
+      "md",
+      "markdown",
+      "mdown",
+      "mkd",
+      "mkdn",
+      "mdx",
+      "contents.lr",
+      "mdwn",
+      "mkdown",
+      "ronn",
+      "workbook"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Mathematica",
+    "extensions": [
+      "cdf",
+      "ma",
+      "mathematica",
+      "mt",
+      "nbp",
+      "wl",
+      "wlt"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "(*",
+      "*)"
+    ]
+  },
+  {
+    "name": "Maven",
+    "extensions": [
+      "pom",
+      "pom.xml"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Maven/XML",
+    "extensions": [],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ],
+    "special_filenames": [
+      "pom.xml"
+    ]
+  },
+  {
+    "name": "Mercury",
+    "extensions": [
+      "m"
+    ],
+    "line_markers": [
+      "%"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Meson",
+    "extensions": [],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null,
+    "special_filenames": [
+      "meson.build"
+    ]
+  },
+  {
+    "name": "Metal",
+    "extensions": [
+      "metal"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Modelica",
+    "extensions": [
+      "mo"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Modula3",
+    "extensions": [
+      "i3",
+      "ig",
+      "m3",
+      "mg"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "Mojo",
+    "extensions": [
+      "mojo",
+      "\ud83d\udd25"
+    ],
+    "line_markers": [
+      "#",
+      "//",
+      "\\*"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Mojom",
+    "extensions": [
+      "mojom"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "MoonBit",
+    "extensions": [
+      "mbt",
+      "mbti",
+      "mbtx",
+      "mbty"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Mustache",
+    "extensions": [
+      "mustache"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "NASTRAN DMAP",
+    "extensions": [
+      "dmap"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "NAnt script",
+    "extensions": [
+      "build"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Nemerle",
+    "extensions": [
+      "n"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "NetLogo",
+    "extensions": [
+      "nlogo",
+      "nls"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Nextflow",
+    "extensions": [
+      "nf"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Nickel",
+    "extensions": [
+      "ncl"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Nim",
+    "extensions": [
+      "nim",
+      "nim.cfg",
+      "nimble",
+      "nimrod",
+      "nims"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Nix",
+    "extensions": [
+      "nix"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Nunjucks",
+    "extensions": [
+      "njk"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "Nushell",
+    "extensions": [
+      "nu"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Nushell Object Notation",
+    "extensions": [
+      "nuon"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "OCaml",
+    "extensions": [
+      "eliom",
+      "eliomi",
+      "ml",
+      "ml4",
+      "mli",
+      "mll",
+      "mly"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "(*",
+      "*)"
+    ]
+  },
+  {
+    "name": "Objective-C",
+    "extensions": [
+      "m"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Objective-C++",
+    "extensions": [
+      "mm"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Octave",
+    "extensions": [
+      "m"
+    ],
+    "line_markers": [
+      "#",
+      "%"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Odin",
+    "extensions": [
+      "odin"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "OpenCL",
+    "extensions": [
+      "cl"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "OpenSCAD",
+    "extensions": [
+      "scad"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Oracle Forms",
+    "extensions": [
+      "fmt"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Oracle PL/SQL",
+    "extensions": [
+      "bdy",
+      "bod",
+      "fnc",
+      "prc",
+      "spc",
+      "trg"
+    ],
+    "line_markers": [
+      "--",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Oracle Reports",
+    "extensions": [
+      "rex"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Org Mode",
+    "extensions": [
+      "org"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "P4",
+    "extensions": [
+      "p4"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "PEG",
+    "extensions": [
+      "peg"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "PHP",
+    "extensions": [
+      "php",
+      "aw",
+      "ctp",
+      "phakefile",
+      "php3",
+      "php4",
+      "php5",
+      "php_cs",
+      "php_cs.dist",
+      "phps",
+      "phpt",
+      "phtml"
+    ],
+    "line_markers": [
+      "//",
+      "#"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "PL/I",
+    "extensions": [
+      "pl1"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "PL/M",
+    "extensions": [
+      "lit",
+      "plm"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "PO File",
+    "extensions": [
+      "po"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "PRQL",
+    "extensions": [
+      "prql"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Pascal",
+    "extensions": [
+      "dpr",
+      "lpr",
+      "pas",
+      "pascal"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "(*",
+      "*)"
+    ]
+  },
+  {
+    "name": "Patran Command Language",
+    "extensions": [
+      "pcl",
+      "ses"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Pawn",
+    "extensions": [
+      "pawn",
+      "pwn"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Pek",
+    "extensions": [
+      "pek"
+    ],
+    "line_markers": [
+      "//"
+    ],
     "block_markers": null
   },
   {
     "name": "Perl",
-    "extensions": ["pl"],
-    "line_markers": ["#"],
+    "extensions": [
+      "pl",
+      "ack",
+      "al",
+      "cpanfile",
+      "makefile.pl",
+      "perl",
+      "ph",
+      "plh",
+      "plx",
+      "pm",
+      "psgi",
+      "rexfile"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Pest",
+    "extensions": [
+      "pest"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Pig Latin",
+    "extensions": [
+      "pig"
+    ],
+    "line_markers": [
+      "--",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Pkl",
+    "extensions": [
+      "pkl"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "PlantUML",
+    "extensions": [
+      "iuml",
+      "plantuml",
+      "pu",
+      "puml",
+      "wsd"
+    ],
+    "line_markers": [
+      "'"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Pony",
+    "extensions": [
+      "pony"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "PowerBuilder",
+    "extensions": [
+      "pbt",
+      "sra",
+      "srf",
+      "srm",
+      "srs",
+      "sru",
+      "srw"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "PowerShell",
+    "extensions": [
+      "ps1",
+      "psd1",
+      "psm1"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Prisma Schema",
+    "extensions": [
+      "prisma"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "ProGuard",
+    "extensions": [
+      "pro"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Processing",
+    "extensions": [
+      "pde"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Prolog",
+    "extensions": [
+      "P",
+      "prolog",
+      "yap"
+    ],
+    "line_markers": [
+      "%",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Properties",
+    "extensions": [],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Protocol Buffers",
+    "extensions": [
+      "proto"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Pug",
+    "extensions": [
+      "jade",
+      "pug"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Puppet",
+    "extensions": [
+      "pp"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "PureScript",
+    "extensions": [
+      "purs"
+    ],
+    "line_markers": [
+      "--"
+    ],
+    "block_markers": [
+      "{-",
+      "-}"
+    ]
+  },
+  {
+    "name": "Python",
+    "extensions": [
+      "py",
+      "buck",
+      "build.bazel",
+      "gclient",
+      "gyp",
+      "gypi",
+      "lmi",
+      "py3",
+      "pyde",
+      "pyi",
+      "pyp",
+      "pyt",
+      "pyw",
+      "sconscript",
+      "sconstruct",
+      "snakefile",
+      "tac",
+      "workspace",
+      "wscript",
+      "wsgi",
+      "xpy"
+    ],
+    "line_markers": [
+      "#",
+      "//",
+      "\\*"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "QML",
+    "extensions": [
+      "qbs",
+      "qml"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "R",
+    "extensions": [
+      "R",
+      "expr-dist",
+      "rd",
+      "rprofile",
+      "rsx"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "RAML",
+    "extensions": [
+      "raml"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Racket",
+    "extensions": [
+      "rkt",
+      "rktd",
+      "rktl",
+      "scrbl"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Raku",
+    "extensions": [
+      "pm6",
+      "raku",
+      "rakumod"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "RapydScript",
+    "extensions": [
+      "pyj"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Razor",
+    "extensions": [
+      "cshtml",
+      "razor"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "ReScript",
+    "extensions": [
+      "res",
+      "resi"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "ReasonML",
+    "extensions": [
+      "re",
+      "rei"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Rego",
+    "extensions": [
+      "rego"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Rexx",
+    "extensions": [
+      "pprx",
+      "rexx"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Rhai",
+    "extensions": [
+      "rhai"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Ring",
+    "extensions": [
+      "rform",
+      "rh",
+      "ring"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Rmd",
+    "extensions": [
+      "Rmd"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "RobotFramework",
+    "extensions": [
+      "robot"
+    ],
+    "line_markers": [
+      "#",
+      "\\*"
+    ],
     "block_markers": null
   },
   {
     "name": "Ruby",
-    "extensions": ["rb"],
-    "line_markers": ["#"],
+    "extensions": [
+      "rb",
+      "appraisals",
+      "berksfile",
+      "brewfile",
+      "builder",
+      "buildfile",
+      "capfile",
+      "dangerfile",
+      "deliverfile",
+      "eye",
+      "fastfile",
+      "gemfile",
+      "gemfile.lock",
+      "gemspec",
+      "god",
+      "guardfile",
+      "irbrc",
+      "jarfile",
+      "jbuilder",
+      "mavenfile",
+      "mspec",
+      "podfile",
+      "podspec",
+      "pryrc",
+      "puppetfile",
+      "rabl",
+      "rake",
+      "rbuild",
+      "rbw",
+      "rbx",
+      "ru",
+      "snapfile",
+      "thor",
+      "thorfile",
+      "vagrantfile",
+      "watchr"
+    ],
+    "line_markers": [
+      "#"
+    ],
     "block_markers": null,
     "special_filenames": [
       "gemfile",
@@ -80,51 +3489,502 @@
     ]
   },
   {
-    "name": "PHP",
-    "extensions": ["php"],
-    "line_markers": ["//", "#"],
-    "block_markers": ["/*", "*/"]
+    "name": "Rust",
+    "extensions": [
+      "rs",
+      "rs.in"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
   },
   {
-    "name": "HTML",
-    "extensions": ["html", "htm"],
-    "line_markers": [],
-    "block_markers": ["<!--", "-->"]
+    "name": "SAS",
+    "extensions": [
+      "sas"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
   },
   {
-    "name": "CSS",
-    "extensions": ["css"],
-    "line_markers": [],
-    "block_markers": ["/*", "*/"]
+    "name": "SCSS",
+    "extensions": [
+      "scss"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
   },
   {
-    "name": "Markdown",
-    "extensions": ["md", "markdown", "mdown", "mkd", "mkdn", "mdx"],
-    "line_markers": [],
-    "block_markers": ["<!--", "-->"]
+    "name": "SKILL",
+    "extensions": [
+      "il",
+      "ils"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "SKILL++",
+    "extensions": [
+      "ils"
+    ],
+    "line_markers": [
+      "//",
+      ";"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "SQL",
+    "extensions": [
+      "SQL",
+      "cql",
+      "mysql",
+      "psql",
+      "tab",
+      "udf",
+      "viw"
+    ],
+    "line_markers": [
+      "--",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
   },
   {
     "name": "SVG",
-    "extensions": ["svg"],
+    "extensions": [
+      "svg"
+    ],
     "line_markers": [],
-    "block_markers": ["<!--", "-->"]
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
   },
   {
-    "name": "XML",
-    "extensions": ["xml"],
-    "line_markers": [],
-    "block_markers": ["<!--", "-->"]
+    "name": "SWIG",
+    "extensions": [
+      "i"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
   },
   {
-    "name": "YAML",
-    "extensions": ["yml", "yaml"],
-    "line_markers": ["#"],
+    "name": "SaltStack",
+    "extensions": [
+      "sls"
+    ],
+    "line_markers": [
+      "#"
+    ],
     "block_markers": null
   },
   {
+    "name": "Sass",
+    "extensions": [
+      "sass"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Scala",
+    "extensions": [
+      "kojo",
+      "sbt",
+      "scala"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Scheme",
+    "extensions": [
+      "sc",
+      "sch",
+      "scm",
+      "sld",
+      "sps",
+      "ss"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Shell",
+    "extensions": [
+      "sh"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Slice",
+    "extensions": [
+      "ice"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Slim",
+    "extensions": [
+      "slim"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "Slint",
+    "extensions": [
+      "slint"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Smalltalk",
+    "extensions": [
+      "st"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "Smarty",
+    "extensions": [
+      "smarty",
+      "tpl"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Snakemake",
+    "extensions": [
+      "rules",
+      "smk"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ],
+    "special_filenames": [
+      "snakefile"
+    ]
+  },
+  {
+    "name": "Softbridge Basic",
+    "extensions": [
+      "SBL"
+    ],
+    "line_markers": [
+      "'"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Solidity",
+    "extensions": [
+      "sol"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "SparForte",
+    "extensions": [
+      "sp"
+    ],
+    "line_markers": [
+      "#",
+      "--"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Specman e",
+    "extensions": [
+      "e"
+    ],
+    "line_markers": [
+      "--",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Squirrel",
+    "extensions": [
+      "nut"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Standard ML",
+    "extensions": [
+      "fun",
+      "sig",
+      "sml"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "(*",
+      "*)"
+    ]
+  },
+  {
+    "name": "Starlark",
+    "extensions": [
+      "bzl",
+      "bazel"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ],
+    "special_filenames": [
+      "build",
+      "build.bazel",
+      "workspace",
+      "workspace.bazel",
+      "module.bazel"
+    ]
+  },
+  {
+    "name": "Stata",
+    "extensions": [
+      "DO",
+      "ado",
+      "doh",
+      "ihlp",
+      "mata",
+      "matah",
+      "sthlp"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Stylus",
+    "extensions": [
+      "styl"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "SugarSS",
+    "extensions": [
+      "sss"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "SurrealQL",
+    "extensions": [
+      "surql"
+    ],
+    "line_markers": [
+      "#",
+      "--",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Svelte",
+    "extensions": [
+      "svelte"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Swift",
+    "extensions": [
+      "swift"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "TEAL",
+    "extensions": [
+      "teal"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "TITAN Project File Information",
+    "extensions": [
+      "tpd"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "TLA+",
+    "extensions": [
+      "tla"
+    ],
+    "line_markers": [
+      "\\*"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "TNSDL",
+    "extensions": [
+      "cii",
+      "cin",
+      "in1",
+      "in2",
+      "in3",
+      "in4",
+      "inf",
+      "interface",
+      "rou",
+      "sdl",
+      "sdt",
+      "spd",
+      "ssc",
+      "sst"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
     "name": "TOML",
-    "extensions": ["toml"],
-    "line_markers": ["#"],
+    "extensions": [
+      "toml"
+    ],
+    "line_markers": [
+      "#"
+    ],
     "block_markers": null,
     "special_filenames": [
       "pipfile",
@@ -132,19 +3992,88 @@
     ]
   },
   {
-    "name": "INI",
-    "extensions": ["ini", "cfg", "conf", "properties"],
-    "line_markers": [";", "#"],
-    "block_markers": null,
-    "special_filenames": [
-      ".editorconfig",
-      ".env",
-      ".envrc"
+    "name": "TTCN",
+    "extensions": [
+      "ttcn",
+      "ttcn2",
+      "ttcn3",
+      "ttcnpp"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "TableGen",
+    "extensions": [
+      "td"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Tcl/Tk",
+    "extensions": [
+      "itk",
+      "tcl",
+      "tk"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Teamcenter met",
+    "extensions": [
+      "met"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Teamcenter mth",
+    "extensions": [
+      "mth"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Templ",
+    "extensions": [
+      "templ"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
     ]
   },
   {
     "name": "Text",
-    "extensions": ["txt", "text"],
+    "extensions": [
+      "txt",
+      "text"
+    ],
     "line_markers": [],
     "block_markers": null,
     "special_filenames": [
@@ -157,64 +4086,961 @@
     ]
   },
   {
+    "name": "Thrift",
+    "extensions": [
+      "thrift"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Titanium Style Sheet",
+    "extensions": [
+      "tss"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Twig",
+    "extensions": [
+      "twig"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "TypeScript",
+    "extensions": [
+      "ts",
+      "tsx",
+      "cts",
+      "mts"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Typst",
+    "extensions": [
+      "typ"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "USS",
+    "extensions": [
+      "uss"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "UXML",
+    "extensions": [
+      "uxml"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Umka",
+    "extensions": [
+      "um"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Unity-Prefab",
+    "extensions": [
+      "mat",
+      "prefab"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "VBA",
+    "extensions": [
+      "VBA"
+    ],
+    "line_markers": [
+      "'"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "VBScript",
+    "extensions": [
+      "VBS"
+    ],
+    "line_markers": [
+      "'"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "VHDL",
+    "extensions": [
+      "VHD",
+      "VHDL",
+      "vhf",
+      "vhi",
+      "vho",
+      "vhs",
+      "vht",
+      "vhw"
+    ],
+    "line_markers": [
+      "--",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "VSCode Workspace",
+    "extensions": [
+      "code-workspace"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Vala",
+    "extensions": [
+      "vala"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Vala Header",
+    "extensions": [
+      "vapi"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Velocity Template Language",
+    "extensions": [
+      "vm"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Verilog-SystemVerilog",
+    "extensions": [
+      "sv",
+      "svh"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Visual Basic",
+    "extensions": [
+      "BAS",
+      "Dsr",
+      "FRX",
+      "ctl",
+      "frm",
+      "vbp",
+      "vbw"
+    ],
+    "line_markers": [
+      "'"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Visual Basic .NET",
+    "extensions": [
+      "VB",
+      "VBHTML",
+      "vbproj"
+    ],
+    "line_markers": [
+      "'"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Visual Fox Pro",
+    "extensions": [
+      "SCA"
+    ],
+    "line_markers": [
+      "\\*"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Visual Studio Solution",
+    "extensions": [
+      "sln"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Visualforce Component",
+    "extensions": [
+      "component"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Visualforce Page",
+    "extensions": [
+      "page"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Vuejs Component",
+    "extensions": [
+      "vue"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Vyper",
+    "extensions": [
+      "vy"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "WGSL",
+    "extensions": [
+      "wgsl"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "WXML",
+    "extensions": [
+      "wxml"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "WXSS",
+    "extensions": [
+      "wxss"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Web Services Description",
+    "extensions": [
+      "wsdl"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "WebAssembly",
+    "extensions": [
+      "wast",
+      "wat"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "WiX include",
+    "extensions": [
+      "wxi"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "WiX source",
+    "extensions": [
+      "wxs"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "WiX string localization",
+    "extensions": [
+      "wxl"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Windows Message File",
+    "extensions": [
+      "mc"
+    ],
+    "line_markers": [
+      "//",
+      ";"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Windows Module Definition",
+    "extensions": [
+      "def"
+    ],
+    "line_markers": [
+      ";"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Windows Resource File",
+    "extensions": [
+      "rc",
+      "rc2"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "X++",
+    "extensions": [
+      "xpo"
+    ],
+    "line_markers": [
+      "#",
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "XAML",
+    "extensions": [
+      "xaml"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "XHTML",
+    "extensions": [
+      "xhtml"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "XMI",
+    "extensions": [
+      "XMI"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "XML",
+    "extensions": [
+      "xml",
+      "adml",
+      "admx",
+      "ant",
+      "app.config",
+      "axml",
+      "builds",
+      "ccproj",
+      "ccxml",
+      "classpath",
+      "clixml",
+      "cproject",
+      "cscfg",
+      "csdef",
+      "csl",
+      "ct",
+      "depproj",
+      "ditamap",
+      "ditaval",
+      "dll.config",
+      "dotsettings",
+      "filters",
+      "fsproj",
+      "gmx",
+      "grxml",
+      "iml",
+      "ivy",
+      "jelly",
+      "jsproj",
+      "kml",
+      "launch",
+      "mdpolicy",
+      "mjml",
+      "natvis",
+      "ndproj",
+      "nproj",
+      "nuget.config",
+      "nuspec",
+      "odd",
+      "osm",
+      "packages.config",
+      "pkgproj",
+      "plist",
+      "proj",
+      "project",
+      "props",
+      "ps1xml",
+      "psc1",
+      "pt",
+      "rdf",
+      "resx",
+      "rss",
+      "scxml",
+      "settings.stylecop",
+      "sfproj",
+      "shproj",
+      "srdf",
+      "storyboard",
+      "sttheme",
+      "sublime-snippet",
+      "targets",
+      "tmcommand",
+      "tml",
+      "tmlanguage",
+      "tmpreferences",
+      "tmsnippet",
+      "tmtheme",
+      "urdf",
+      "ux",
+      "vcxproj",
+      "vsixmanifest",
+      "vssettings",
+      "vstemplate",
+      "vxml",
+      "web.config",
+      "web.debug.config",
+      "web.release.config",
+      "wsf",
+      "x3d",
+      "xacro",
+      "xib",
+      "xlf",
+      "xliff",
+      "xml.dist",
+      "xproj",
+      "xspec",
+      "xul",
+      "zcml"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "XQuery",
+    "extensions": [
+      "xq",
+      "xql",
+      "xqm",
+      "xquery",
+      "xqy"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "XSD",
+    "extensions": [
+      "XSD"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "XSLT",
+    "extensions": [
+      "XSL",
+      "XSLT"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "Xtend",
+    "extensions": [
+      "xtend"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "YAML",
+    "extensions": [
+      "yml",
+      "yaml",
+      "clang-format",
+      "clang-tidy",
+      "gemrc",
+      "glide.lock",
+      "mir",
+      "reek",
+      "rviz",
+      "sublime-syntax",
+      "syntax",
+      "yaml-tmlanguage",
+      "yml.mysql"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Yang",
+    "extensions": [
+      "yang"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "Yarn",
+    "extensions": [
+      "yarn"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "Zig",
+    "extensions": [
+      "zig"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "awk",
+    "extensions": [
+      "auk",
+      "awk",
+      "gawk",
+      "mawk",
+      "nawk"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "bc",
+    "extensions": [],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null,
+    "special_filenames": [
+      "bc"
+    ]
+  },
+  {
+    "name": "builder",
+    "extensions": [
+      "xml.builder"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "csh",
+    "extensions": [
+      "csh",
+      "tcsh"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "dhall",
+    "extensions": [
+      "dhall"
+    ],
+    "line_markers": [
+      "--"
+    ],
+    "block_markers": [
+      "{-",
+      "-}"
+    ]
+  },
+  {
+    "name": "diff",
+    "extensions": [
+      "diff",
+      "patch"
+    ],
+    "line_markers": [
+      "#",
+      "--"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "dtrace",
+    "extensions": [],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null,
+    "special_filenames": [
+      "dtrace"
+    ]
+  },
+  {
+    "name": "ksh",
+    "extensions": [
+      "ksh"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "kvlang",
+    "extensions": [
+      "kv"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "lex",
+    "extensions": [
+      "l",
+      "lex"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "liquid",
+    "extensions": [
+      "liquid"
+    ],
+    "line_markers": [],
+    "block_markers": [
+      "<!--",
+      "-->"
+    ]
+  },
+  {
+    "name": "m4",
+    "extensions": [
+      "ac",
+      "m4"
+    ],
+    "line_markers": [],
+    "block_markers": null
+  },
+  {
+    "name": "peg.js",
+    "extensions": [
+      "pegjs"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "peggy",
+    "extensions": [
+      "peggy"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
     "name": "reStructuredText",
-    "extensions": ["rst"],
+    "extensions": [
+      "rst",
+      "rest",
+      "rest.txt",
+      "rst.txt"
+    ],
     "line_markers": [],
     "block_markers": null
   },
   {
-    "name": "AsciiDoc",
-    "extensions": ["adoc", "asciidoc"],
-    "line_markers": ["//"],
+    "name": "sed",
+    "extensions": [
+      "sed"
+    ],
+    "line_markers": [
+      "#"
+    ],
     "block_markers": null
   },
   {
-    "name": "JSON",
-    "extensions": ["json"],
+    "name": "sh",
+    "extensions": [],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
+  },
+  {
+    "name": "tspeg",
+    "extensions": [
+      "jspeg",
+      "tspeg"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
+  },
+  {
+    "name": "vim script",
+    "extensions": [
+      "vim"
+    ],
     "line_markers": [],
     "block_markers": null
   },
   {
-    "name": "Starlark",
-    "extensions": ["bzl"],
-    "line_markers": ["#"],
-    "block_markers": null,
-    "special_filenames": [
-      "build",
-      "build.bazel",
-      "workspace",
-      "workspace.bazel",
-      "module.bazel"
+    "name": "xBase",
+    "extensions": [
+      "prg",
+      "prw"
+    ],
+    "line_markers": [
+      "//",
+      "\\*"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
     ]
   },
   {
-    "name": "Just",
-    "extensions": [],
-    "line_markers": ["#"],
-    "block_markers": null,
-    "special_filenames": [
-      "justfile"
+    "name": "xBase Header",
+    "extensions": [
+      "ch"
+    ],
+    "line_markers": [
+      "//",
+      "\\*"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
     ]
   },
   {
-    "name": "Dockerfile",
-    "extensions": [],
-    "line_markers": ["#"],
-    "block_markers": null,
-    "special_filenames": ["dockerfile"]
+    "name": "yacc",
+    "extensions": [
+      "y",
+      "yacc"
+    ],
+    "line_markers": [
+      "//"
+    ],
+    "block_markers": [
+      "/*",
+      "*/"
+    ]
   },
   {
-    "name": "Make",
-    "extensions": [],
-    "line_markers": ["#"],
-    "block_markers": null,
-    "special_filenames": ["makefile", "gnumakefile"]
-  },
-  {
-    "name": "CMake",
-    "extensions": ["cmake"],
-    "line_markers": ["#"],
-    "block_markers": null,
-    "special_filenames": ["cmakelists.txt"]
+    "name": "zsh",
+    "extensions": [
+      "zsh"
+    ],
+    "line_markers": [
+      "#"
+    ],
+    "block_markers": null
   }
 ]
