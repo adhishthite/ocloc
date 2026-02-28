@@ -1,6 +1,8 @@
 use crate::types::{AnalyzeResult, FileCounts};
 use chrono::Local;
+use std::fmt::Write;
 
+#[allow(clippy::too_many_lines, clippy::cast_precision_loss)]
 pub fn format(a: &AnalyzeResult) -> String {
     let mut output = String::new();
 
@@ -18,14 +20,9 @@ pub fn format(a: &AnalyzeResult) -> String {
         output.push_str(
             "═══════════════════════════════════════════════════════════════════════════════════\n",
         );
-        output.push_str(&format!(
-            "                         REPORT FOR: {}\n",
-            dir_name.to_uppercase()
-        ));
-        output.push_str(&format!(
-            "                         Generated: {}\n",
-            friendly_date
-        ));
+        let _ = writeln!(output, "                         REPORT FOR: {}",
+            dir_name.to_uppercase());
+        let _ = writeln!(output, "                         Generated: {friendly_date}");
         output.push_str("═══════════════════════════════════════════════════════════════════════════════════\n\n");
     }
 
@@ -33,33 +30,23 @@ pub fn format(a: &AnalyzeResult) -> String {
     if let Some(ref stats) = a.stats {
         output.push_str("File Statistics:\n");
         output.push_str("─────────────────────────────────────\n");
-        output.push_str(&format!(
-            "  Text Files    : {:>10}\n",
-            format_num(stats.total_files)
-        ));
-        output.push_str(&format!(
-            "  Unique Files  : {:>10}\n",
-            format_num(stats.unique_files)
-        ));
-        output.push_str(&format!(
-            "  Ignored Files : {:>10}\n",
-            format_num(stats.ignored_files)
-        ));
+        let _ = writeln!(output, "  Text Files    : {:>10}",
+            format_num(stats.total_files));
+        let _ = writeln!(output, "  Unique Files  : {:>10}",
+            format_num(stats.unique_files));
+        let _ = writeln!(output, "  Ignored Files : {:>10}",
+            format_num(stats.ignored_files));
         if stats.empty_files > 0 {
-            output.push_str(&format!(
-                "  Empty Files   : {:>10}\n",
-                format_num(stats.empty_files)
-            ));
+            let _ = writeln!(output, "  Empty Files   : {:>10}",
+                format_num(stats.empty_files));
         }
         output.push_str("─────────────────────────────────────\n\n");
 
         // Show performance statistics
         output.push_str("Performance:\n");
         output.push_str("─────────────────────────────────────\n");
-        output.push_str(&format!(
-            "  Elapsed Time  : {:>10.2} s\n",
-            stats.elapsed_seconds
-        ));
+        let _ = writeln!(output, "  Elapsed Time  : {:>10.2} s",
+            stats.elapsed_seconds);
 
         let denom = if stats.elapsed_seconds > 0.0 {
             stats.elapsed_seconds
@@ -67,11 +54,11 @@ pub fn format(a: &AnalyzeResult) -> String {
             1.0
         };
         let files_per_sec = stats.unique_files as f64 / denom;
-        output.push_str(&format!("  Files/sec     : {:>10.1}\n", files_per_sec));
+        let _ = writeln!(output, "  Files/sec     : {files_per_sec:>10.1}");
 
         let total_lines = a.totals.total;
         let lines_per_sec = total_lines as f64 / denom;
-        output.push_str(&format!("  Lines/sec     : {:>10.0}\n", lines_per_sec));
+        let _ = writeln!(output, "  Lines/sec     : {lines_per_sec:>10.0}");
         output.push_str("─────────────────────────────────────\n\n");
     }
     // Compute dynamic column widths with more generous minimums
@@ -92,7 +79,7 @@ pub fn format(a: &AnalyzeResult) -> String {
     lang_w = a
         .per_lang
         .keys()
-        .map(|s| s.len())
+        .map(String::len)
         .chain(std::iter::once("Total".len()))
         .max()
         .unwrap_or(lang_w)
@@ -165,6 +152,56 @@ pub fn format(a: &AnalyzeResult) -> String {
     output
 }
 
+struct ColWidths {
+    lang: usize,
+    files: usize,
+    blank: usize,
+    comm: usize,
+    code: usize,
+    total: usize,
+}
+
+fn format_row(lang: &str, c: &FileCounts, w: &ColWidths, sep: &str) -> String {
+    // Prepare plain cells with alignment first
+    let name_plain = format!("{:<w$}", lang, w = w.lang);
+    let files_plain = format!("{:>w$}", format_num(c.files), w = w.files);
+    let blank_plain = format!("{:>w$}", format_num(c.blank), w = w.blank);
+    let comm_plain = format!("{:>w$}", format_num(c.comment), w = w.comm);
+    let code_plain = format!("{:>w$}", format_num(c.code), w = w.code);
+    let total_plain = format!("{:>w$}", format_num(c.total), w = w.total);
+
+    [
+        name_plain,
+        files_plain,
+        blank_plain,
+        comm_plain,
+        code_plain,
+        total_plain,
+    ]
+    .join(sep)
+}
+
+#[allow(clippy::cast_possible_wrap, clippy::cast_sign_loss)]
+fn format_num(n: usize) -> String {
+    let s = n.to_string();
+    let mut out = String::new();
+    let bytes = s.as_bytes();
+    let mut i = bytes.len() as isize - 1;
+    let mut count = 0;
+    while i >= 0 {
+        out.insert(0, bytes[i as usize] as char);
+        count += 1;
+        if count == 3 && i > 0 {
+            out.insert(0, ',');
+            count = 0;
+        }
+        i -= 1;
+    }
+    out
+}
+
+// Colors removed: produce plain, deterministic table output
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -210,52 +247,3 @@ mod tests {
         assert!(out.contains("Total"));
     }
 }
-
-struct ColWidths {
-    lang: usize,
-    files: usize,
-    blank: usize,
-    comm: usize,
-    code: usize,
-    total: usize,
-}
-
-fn format_row(lang: &str, c: &FileCounts, w: &ColWidths, sep: &str) -> String {
-    // Prepare plain cells with alignment first
-    let name_plain = format!("{:<w$}", lang, w = w.lang);
-    let files_plain = format!("{:>w$}", format_num(c.files), w = w.files);
-    let blank_plain = format!("{:>w$}", format_num(c.blank), w = w.blank);
-    let comm_plain = format!("{:>w$}", format_num(c.comment), w = w.comm);
-    let code_plain = format!("{:>w$}", format_num(c.code), w = w.code);
-    let total_plain = format!("{:>w$}", format_num(c.total), w = w.total);
-
-    [
-        name_plain,
-        files_plain,
-        blank_plain,
-        comm_plain,
-        code_plain,
-        total_plain,
-    ]
-    .join(sep)
-}
-
-fn format_num(n: usize) -> String {
-    let s = n.to_string();
-    let mut out = String::new();
-    let bytes = s.as_bytes();
-    let mut i = bytes.len() as isize - 1;
-    let mut count = 0;
-    while i >= 0 {
-        out.insert(0, bytes[i as usize] as char);
-        count += 1;
-        if count == 3 && i > 0 {
-            out.insert(0, ',');
-            count = 0;
-        }
-        i -= 1;
-    }
-    out
-}
-
-// Colors removed: produce plain, deterministic table output

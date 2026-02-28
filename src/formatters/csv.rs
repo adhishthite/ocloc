@@ -1,5 +1,6 @@
 use crate::types::{AnalyzeResult, FileCounts};
 
+#[must_use]
 pub fn format(a: &AnalyzeResult) -> String {
     let mut out = String::new();
     out.push_str("language,files,code,comment,blank,total\n");

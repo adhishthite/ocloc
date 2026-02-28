@@ -22,6 +22,10 @@ pub fn set_analyzer_config(no_mmap: bool, mmap_threshold: Option<u64>) {
     });
 }
 
+/// Analyzes a file and returns line count statistics.
+///
+/// # Errors
+/// Returns an error if the file cannot be opened or read.
 pub fn analyze_file(path: &Path) -> Result<FileCounts> {
     let file = File::open(path).with_context(|| format!("open file: {}", path.display()))?;
     // Use mmap for large files to reduce syscall overhead (configurable)
@@ -31,7 +35,7 @@ pub fn analyze_file(path: &Path) -> Result<FileCounts> {
                 if meta.len() >= cfg.mmap_threshold {
                     // Safety: file is not mutated while mapping; read-only map
                     if let Ok(mmap) = unsafe { memmap2::Mmap::map(&file) } {
-                        let mut rdr = std::io::Cursor::new(&mmap[..]);
+                        let mut rdr = io::Cursor::new(&mmap[..]);
                         return analyze_reader(&mut rdr, path);
                     }
                 }
@@ -42,6 +46,10 @@ pub fn analyze_file(path: &Path) -> Result<FileCounts> {
     analyze_reader(&mut reader, path)
 }
 
+/// Analyzes a buffered reader and returns line count statistics.
+///
+/// # Errors
+/// Returns an error if reading from the reader fails.
 pub fn analyze_reader<R: BufRead + ?Sized>(reader: &mut R, path_hint: &Path) -> Result<FileCounts> {
     // Locate language by extension; unknown -> skip counts but still produce 0s
     let lang_idx = find_language_index_for_path(path_hint);
@@ -51,12 +59,9 @@ pub fn analyze_reader<R: BufRead + ?Sized>(reader: &mut R, path_hint: &Path) -> 
     let mut in_block: Option<(Vec<u8>, Vec<u8>)> = None;
 
     // Obtain markers
+    #[allow(clippy::items_after_statements)]
     type MarkersTuple = (&'static [Vec<u8>], Option<(&'static [u8], &'static [u8])>);
-    let (line_markers_vec, block_markers_bytes): MarkersTuple = if let Some(idx) = lang_idx {
-        language_markers_bytes(idx)
-    } else {
-        (&[], None)
-    };
+    let (line_markers_vec, block_markers_bytes): MarkersTuple = lang_idx.map_or((&[], None), language_markers_bytes);
 
     // Fast zero-byte file handling if possible
     if let Ok(slice) = reader.fill_buf() {
@@ -80,7 +85,7 @@ pub fn analyze_reader<R: BufRead + ?Sized>(reader: &mut R, path_hint: &Path) -> 
                 process_line(
                     &mut counts,
                     line_markers_vec,
-                    &block_markers_bytes,
+                    block_markers_bytes.as_ref(),
                     &mut in_block,
                     trim_cr(&pending),
                 );
@@ -95,7 +100,7 @@ pub fn analyze_reader<R: BufRead + ?Sized>(reader: &mut R, path_hint: &Path) -> 
                 process_line(
                     &mut counts,
                     line_markers_vec,
-                    &block_markers_bytes,
+                    block_markers_bytes.as_ref(),
                     &mut in_block,
                     trim_cr(&chunk[start..i]),
                 );
@@ -105,7 +110,7 @@ pub fn analyze_reader<R: BufRead + ?Sized>(reader: &mut R, path_hint: &Path) -> 
                 process_line(
                     &mut counts,
                     line_markers_vec,
-                    &block_markers_bytes,
+                    block_markers_bytes.as_ref(),
                     &mut in_block,
                     line,
                 );
@@ -121,12 +126,15 @@ pub fn analyze_reader<R: BufRead + ?Sized>(reader: &mut R, path_hint: &Path) -> 
     Ok(counts)
 }
 
-// Backward-compatible wrapper for callers that pass an owned reader
+/// Backward-compatible wrapper for callers that pass an owned reader.
+///
+/// # Errors
+/// Returns an error if reading from the reader fails.
 pub fn analyze_reader_owned<R: BufRead>(mut reader: R, path_hint: &Path) -> Result<FileCounts> {
     analyze_reader(&mut reader, path_hint)
 }
 
-fn trim_ascii_start(mut s: &[u8]) -> &[u8] {
+const fn trim_ascii_start(mut s: &[u8]) -> &[u8] {
     while let Some((&b, rest)) = s.split_first() {
         if b.is_ascii_whitespace() {
             s = rest;
@@ -137,7 +145,7 @@ fn trim_ascii_start(mut s: &[u8]) -> &[u8] {
     s
 }
 
-fn trim_cr(s: &[u8]) -> &[u8] {
+const fn trim_cr(s: &[u8]) -> &[u8] {
     if let Some((&last, body)) = s.split_last() {
         if last == b'\r' {
             return body;
@@ -156,7 +164,7 @@ fn find_bytes(hay: &[u8], needle: &[u8]) -> Option<usize> {
 fn process_line(
     counts: &mut FileCounts,
     line_markers: &[Vec<u8>],
-    block_markers: &Option<(&[u8], &[u8])>,
+    block_markers: Option<&(&[u8], &[u8])>,
     in_block: &mut Option<(Vec<u8>, Vec<u8>)>,
     raw: &[u8],
 ) {
@@ -168,7 +176,7 @@ fn process_line(
     }
 
     // If already in a block, search for end
-    if let &mut Some((_, ref end)) = in_block {
+    if let Some((_, ref end)) = *in_block {
         if let Some(idx) = find_bytes(trimmed, end.as_slice()) {
             let after = &trimmed[idx + end.len()..];
             *in_block = None;
@@ -178,13 +186,12 @@ fn process_line(
                 counts.code += 1;
             }
             return;
-        } else {
-            counts.comment += 1;
-            return;
         }
+        counts.comment += 1;
+        return;
     }
 
-    if let Some((start, end)) = block_markers {
+    if let Some(&(start, end)) = block_markers {
         if let Some(start_idx) = find_bytes(trimmed, start) {
             if let Some(end_rel) = find_bytes(&trimmed[start_idx + start.len()..], end) {
                 let before = &trimmed[..start_idx];
@@ -195,17 +202,16 @@ fn process_line(
                     counts.code += 1;
                 }
                 return;
-            } else {
-                // starts block; remains open
-                *in_block = Some((start.to_vec(), end.to_vec()));
-                let before = &trimmed[..start_idx];
-                if trim_ascii_start(before).is_empty() {
-                    counts.comment += 1;
-                } else {
-                    counts.code += 1;
-                }
-                return;
             }
+            // starts block; remains open
+            *in_block = Some((start.to_vec(), end.to_vec()));
+            let before = &trimmed[..start_idx];
+            if trim_ascii_start(before).is_empty() {
+                counts.comment += 1;
+            } else {
+                counts.code += 1;
+            }
+            return;
         }
     }
 
@@ -231,7 +237,7 @@ mod tests {
     fn rust_line_and_block_comments() {
         let dir = tempdir().unwrap();
         let path = dir.path().join("sample.rs");
-        let mut f = std::fs::File::create(&path).unwrap();
+        let mut f = File::create(&path).unwrap();
         write!(
             f,
             "// line\ncode\n/* block */\ncode /* mid */ more\n/* start\ncontinued\nend */\n"
@@ -248,7 +254,7 @@ mod tests {
     fn python_triple_quoted_strings_treated_as_code() {
         let dir = tempdir().unwrap();
         let path = dir.path().join("doc.py");
-        let mut f = std::fs::File::create(&path).unwrap();
+        let mut f = File::create(&path).unwrap();
         write!(
             f,
             "\n\n\"\"\"Module docstring\nspans lines\n\"\"\"\n\n# comment line\nprint(1)\n"
@@ -269,7 +275,7 @@ mod tests {
     fn html_block_comments() {
         let dir = tempdir().unwrap();
         let path = dir.path().join("page.html");
-        let mut f = std::fs::File::create(&path).unwrap();
+        let mut f = File::create(&path).unwrap();
         write!(
             f,
             "<!-- head -->\n<div>content</div>\n<!-- start\ncontinued\nend -->\n<div><!-- mid --></div>\n"
@@ -288,7 +294,7 @@ mod tests {
     fn markdown_html_comments() {
         let dir = tempdir().unwrap();
         let path = dir.path().join("README.md");
-        let mut f = std::fs::File::create(&path).unwrap();
+        let mut f = File::create(&path).unwrap();
         write!(
             f,
             "# Title\n\n<!-- intro -->\nSome text paragraph.\n<!-- start\nmultiline\nend -->\n"
@@ -309,7 +315,7 @@ mod tests {
     fn ini_line_comments() {
         let dir = tempdir().unwrap();
         let path = dir.path().join("settings.ini");
-        let mut f = std::fs::File::create(&path).unwrap();
+        let mut f = File::create(&path).unwrap();
         write!(
             f,
             "; leading comment\n# another comment\n\n[section]\nkey=value\nkey2 = value2  # trailing\n"
@@ -330,7 +336,7 @@ mod tests {
     fn svg_xml_comments() {
         let dir = tempdir().unwrap();
         let path = dir.path().join("icon.svg");
-        let mut f = std::fs::File::create(&path).unwrap();
+        let mut f = File::create(&path).unwrap();
         write!(
             f,
             "<?xml version=\"1.0\"?>\n<!-- single -->\n<svg>\n  <!-- start\n  mid\n  end -->\n</svg>\n"

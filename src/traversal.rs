@@ -1,8 +1,9 @@
+#![allow(clippy::must_use_candidate, clippy::missing_errors_doc)]
+
 use std::collections::HashSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use anyhow::Result;
 use ignore::{WalkBuilder, overrides::OverrideBuilder};
 
 pub struct TraversalOptions {
@@ -43,7 +44,7 @@ pub fn build_walk_builder(root: &Path, opts: &TraversalOptions) -> WalkBuilder {
         // This is a best-effort filter; analyzer still checks language.
         let mut ob = OverrideBuilder::new(root);
         for ext in allowed {
-            let _ = ob.add(&format!("**/*.{}", ext));
+            let _ = ob.add(&format!("**/*.{ext}"));
         }
         if let Ok(ov) = ob.build() {
             builder.overrides(ov);
@@ -53,16 +54,13 @@ pub fn build_walk_builder(root: &Path, opts: &TraversalOptions) -> WalkBuilder {
     builder
 }
 
-#[allow(dead_code)]
-pub fn collect_files(root: &Path, opts: TraversalOptions) -> Result<Vec<PathBuf>> {
-    let builder = build_walk_builder(root, &opts);
+#[allow(dead_code, clippy::unnecessary_wraps)]
+pub fn collect_files(root: &Path, opts: &TraversalOptions) -> Vec<PathBuf> {
+    let builder = build_walk_builder(root, opts);
 
     let mut out = Vec::new();
     for dent in builder.build() {
-        let dent = match dent {
-            Ok(d) => d,
-            Err(_) => continue,
-        };
+        let Ok(dent) = dent else { continue };
         let path = dent.path();
         if !path.is_file() {
             continue;
@@ -94,5 +92,5 @@ pub fn collect_files(root: &Path, opts: TraversalOptions) -> Result<Vec<PathBuf>
         out.push(path.to_path_buf());
     }
 
-    Ok(out)
+    out
 }

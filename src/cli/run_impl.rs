@@ -13,7 +13,8 @@ use crate::{analyzer, formatters};
 
 use super::Args;
 
-pub fn run_with_args(args: Args) -> Result<()> {
+#[allow(clippy::too_many_lines)]
+pub fn run_with_args(args: &Args) -> Result<()> {
     let start_time = Instant::now();
     if args.threads > 0 {
         rayon::ThreadPoolBuilder::new()
@@ -40,7 +41,7 @@ pub fn run_with_args(args: Args) -> Result<()> {
     if args.verbose > 0 {
         eprintln!("Scanning path: {}", args.path.display());
         if let Some(ref list) = args.extensions {
-            eprintln!("Extensions filter: {}", list);
+            eprintln!("Extensions filter: {list}");
         }
     }
     // Configure analyzer global settings (no-mmap and threshold)
@@ -53,6 +54,7 @@ pub fn run_with_args(args: Args) -> Result<()> {
     // Progress setup (unknown length with parallel walk)
     let pb = if args.progress && !args.ultra {
         let pb = indicatif::ProgressBar::new_spinner();
+        #[allow(clippy::literal_string_with_formatting_args)]
         if let Ok(style) =
             indicatif::ProgressStyle::with_template("{spinner} {pos} files {elapsed}")
         {
@@ -70,10 +72,12 @@ pub fn run_with_args(args: Args) -> Result<()> {
     let global_map: Arc<std::sync::Mutex<indexmap::IndexMap<String, FileCounts>>> =
         Arc::new(std::sync::Mutex::new(indexmap::IndexMap::new()));
 
+    #[allow(clippy::items_after_statements)]
     struct ThreadAgg {
         local: indexmap::IndexMap<String, FileCounts>,
         global: Arc<std::sync::Mutex<indexmap::IndexMap<String, FileCounts>>>,
     }
+    #[allow(clippy::items_after_statements)]
     impl ThreadAgg {
         fn new(global: Arc<std::sync::Mutex<indexmap::IndexMap<String, FileCounts>>>) -> Self {
             Self {
@@ -86,6 +90,7 @@ pub fn run_with_args(args: Args) -> Result<()> {
             entry.merge(&counts);
         }
     }
+    #[allow(clippy::items_after_statements)]
     impl Drop for ThreadAgg {
         fn drop(&mut self) {
             if let Ok(mut g) = self.global.lock() {
@@ -102,7 +107,7 @@ pub fn run_with_args(args: Args) -> Result<()> {
         let empty_counter = empty_counter.clone();
         let progress_counter = progress_counter.clone();
         let mut agg = ThreadAgg::new(global_map.clone());
-        let pb_inner = pb.as_ref().cloned();
+        let pb_inner = pb.clone();
         Box::new(move |entry: Result<ignore::DirEntry, ignore::Error>| {
             let dent: ignore::DirEntry = match entry {
                 Ok(d) => d,
@@ -164,7 +169,7 @@ pub fn run_with_args(args: Args) -> Result<()> {
         })
     });
 
-    let per_lang_map = Arc::try_unwrap(global_map).unwrap().into_inner().unwrap();
+    let per_lang_map = Arc::try_unwrap(global_map).unwrap().into_inner()?;
 
     let mut per_lang: indexmap::IndexMap<String, FileCounts> = indexmap::IndexMap::new();
     let mut totals = FileCounts::default();
@@ -173,7 +178,7 @@ pub fn run_with_args(args: Args) -> Result<()> {
             totals = *total_counts;
         }
     } else {
-        for (lang, counts) in per_lang_map.iter() {
+        for (lang, counts) in &per_lang_map {
             per_lang.insert(lang.clone(), *counts);
             totals.merge(counts);
         }
@@ -215,7 +220,7 @@ pub fn run_with_args(args: Args) -> Result<()> {
         analyzed_path: Some(
             args.path
                 .canonicalize()
-                .unwrap_or(args.path.clone())
+                .unwrap_or_else(|_| args.path.clone())
                 .display()
                 .to_string(),
         ),
@@ -237,17 +242,17 @@ pub fn run_with_args(args: Args) -> Result<()> {
 
     if args.json {
         let s = serde_json::to_string_pretty(&analyze)?;
-        println!("{}", s);
+        println!("{s}");
         return Ok(());
     }
     if args.csv {
         let s = formatters::csv::format(&analyze);
-        println!("{}", s);
+        println!("{s}");
         return Ok(());
     }
 
     // default pretty table (ultra still prints table, but with only totals)
     let s = formatters::table::format(&analyze);
-    println!("{}", s);
+    println!("{s}");
     Ok(())
 }

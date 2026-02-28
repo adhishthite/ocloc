@@ -6,6 +6,7 @@ use clap::{ArgAction, Parser, ValueHint};
 mod run_impl;
 mod sub_diff;
 
+#[allow(clippy::struct_excessive_bools)]
 #[derive(Parser, Debug, Clone)]
 #[command(name = "ocloc", version, about = "Fast, reliable lines-of-code counter", long_about = None)]
 pub struct Args {
@@ -77,14 +78,18 @@ pub struct Args {
     pub ultra: bool,
 }
 
+/// Runs the CLI application.
+///
+/// # Errors
+/// Returns an error if command execution fails.
 pub fn run() -> Result<()> {
     let args = Args::parse();
     if let Some(cmd) = &args.cmd {
-        match cmd {
-            Subcommand::Diff(diff_args) => return sub_diff::run_diff(diff_args),
+        return match cmd {
+            Subcommand::Diff(diff_args) => sub_diff::run_diff(diff_args),
         }
     }
-    run_impl::run_with_args(args)
+    run_impl::run_with_args(&args)
 }
 
 #[derive(clap::Subcommand, Debug, Clone)]
@@ -93,6 +98,7 @@ pub enum Subcommand {
     Diff(DiffArgs),
 }
 
+#[allow(clippy::struct_excessive_bools)]
 #[derive(clap::Args, Debug, Clone)]
 pub struct DiffArgs {
     /// Base git rev (commit, tag, or ref)
