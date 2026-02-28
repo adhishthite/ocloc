@@ -129,9 +129,9 @@ fn diff_mode_reports_deletions_and_removed_code() {
 
     // create and commit two files
     let a_rs = root.join("a.rs");
-    std::fs::write(&a_rs, "fn main() {}\n// x\n").unwrap();
+    fs::write(&a_rs, "fn main() {}\n// x\n").unwrap();
     let b_rs = root.join("b.rs");
-    std::fs::write(&b_rs, "fn helper() {}\n").unwrap();
+    fs::write(&b_rs, "fn helper() {}\n").unwrap();
     assert!(
         std::process::Command::new("git")
             .arg("add")
@@ -167,7 +167,7 @@ fn diff_mode_reports_deletions_and_removed_code() {
             .unwrap()
             .success()
     );
-    std::fs::write(&a_rs, "// only comment now\n").unwrap();
+    fs::write(&a_rs, "// only comment now\n").unwrap();
     assert!(
         std::process::Command::new("git")
             .arg("add")

@@ -11,6 +11,7 @@ use crate::vcs::VcsContext;
 
 use super::DiffArgs;
 
+#[allow(clippy::too_many_lines)]
 pub fn run_diff(args: &DiffArgs) -> Result<()> {
     // Validate incompatible flags
     if args.staged && args.working_tree {
@@ -20,6 +21,7 @@ pub fn run_diff(args: &DiffArgs) -> Result<()> {
     let vcs = VcsContext::open(Path::new("."))?;
 
     // diff mode selection
+    #[allow(clippy::items_after_statements)]
     enum Mode {
         Range,
         Staged,
@@ -38,7 +40,7 @@ pub fn run_diff(args: &DiffArgs) -> Result<()> {
             let head_oid = vcs.head_oid().ok();
             let base_info = head_oid.map(|o| GitRefInfo {
                 reference: Some(o.to_string()),
-                short: Some(format!("{:.7}", o)),
+                short: Some(format!("{o:.7}")),
             });
             let head_info = Some(GitRefInfo {
                 reference: Some("INDEX".to_string()),
@@ -85,11 +87,11 @@ pub fn run_diff(args: &DiffArgs) -> Result<()> {
             };
             let base_info = Some(GitRefInfo {
                 reference: Some(base_oid.to_string()),
-                short: Some(format!("{:.7}", base_oid)),
+                short: Some(format!("{base_oid:.7}")),
             });
             let head_info = Some(GitRefInfo {
                 reference: Some(head_oid.to_string()),
-                short: Some(format!("{:.7}", head_oid)),
+                short: Some(format!("{head_oid:.7}")),
             });
             (
                 vcs.diff_between(base_oid, head_oid)?,
@@ -132,6 +134,7 @@ pub fn run_diff(args: &DiffArgs) -> Result<()> {
             let lang = find_language_for_path(&path_hint).unwrap_or("Unknown");
 
             // Analyze base and head content with sensible fallbacks
+            #[allow(clippy::option_if_let_else)]
             let base_counts = if let Some(bytes) = vcs.read_blob_bytes(c.oids.old) {
                 analyze_bytes(&bytes, &path_hint).unwrap_or_default()
             } else if let Some(ref p) = c.old_path {
@@ -151,12 +154,16 @@ pub fn run_diff(args: &DiffArgs) -> Result<()> {
                 FileCounts::default()
             };
 
+            #[allow(clippy::cast_possible_wrap)]
             let code_delta = head_counts.code as isize - base_counts.code as isize;
+            #[allow(clippy::cast_possible_wrap)]
             let comment_delta = head_counts.comment as isize - base_counts.comment as isize;
+            #[allow(clippy::cast_possible_wrap)]
             let blank_delta = head_counts.blank as isize - base_counts.blank as isize;
+            #[allow(clippy::cast_possible_wrap)]
             let total_delta = head_counts.total as isize - base_counts.total as isize;
 
-            let status = c.status.clone();
+            let status = c.status;
             let lang = lang.to_string();
             Some((
                 path_hint,
@@ -203,7 +210,7 @@ pub fn run_diff(args: &DiffArgs) -> Result<()> {
 
     // Totals
     let mut totals = LineDelta::default();
-    for (_lang, d) in per_lang.iter() {
+    for (_lang, d) in &per_lang {
         totals.files += d.files;
         totals.code_added += d.code_added;
         totals.code_removed += d.code_removed;
@@ -235,6 +242,7 @@ pub fn run_diff(args: &DiffArgs) -> Result<()> {
     // Threshold checks: only fail with non-zero exit if explicitly requested
     let mut threshold_errors: Vec<String> = Vec::new();
     if let Some(max) = args.max_code_added {
+        #[allow(clippy::cast_possible_wrap)]
         if summary.totals.code_added > max as isize {
             threshold_errors.push(format!(
                 "code delta {} exceeds threshold {}",
@@ -271,7 +279,7 @@ pub fn run_diff(args: &DiffArgs) -> Result<()> {
         for (lang, d) in &summary.languages {
             if let Some(limit) = limits.get(lang) {
                 if d.code_added > *limit {
-                    violations.push(format!("{}>{}", lang, limit));
+                    violations.push(format!("{lang}>{limit}"));
                 }
             }
         }
@@ -287,10 +295,9 @@ pub fn run_diff(args: &DiffArgs) -> Result<()> {
         emit_output(args, &summary);
         if args.fail_on_threshold {
             bail!(threshold_errors.join("; "));
-        } else {
-            eprintln!("Warning: {}", threshold_errors.join("; "));
-            return Ok(());
         }
+        eprintln!("Warning: {}", threshold_errors.join("; "));
+        return Ok(());
     }
     emit_output(args, &summary);
     Ok(())
@@ -378,7 +385,7 @@ fn print_csv(s: &DiffSummary) {
 fn print_markdown(s: &DiffSummary) {
     let base = s.base_ref.as_deref().unwrap_or("<base>");
     let head = s.head_ref.as_deref().unwrap_or("<head>");
-    println!("### LOC Diff Summary ({} → {})", base, head);
+    println!("### LOC Diff Summary ({base} → {head})");
     println!(
         "- Files: {} (A:{} · M:{} · D:{} · R:{})",
         s.files, s.files_added, s.files_modified, s.files_deleted, s.files_renamed
@@ -418,7 +425,7 @@ fn print_markdown(s: &DiffSummary) {
         println!("| File | status | language | code Δ | comment Δ | blank Δ | net Δ |");
         println!("|------|:------:|:--------:|------:|----------:|--------:|-----:|");
         let mut files = s.by_file.clone();
-        files.sort_by(|a, b| b.total_delta.abs().cmp(&a.total_delta.abs()));
+        files.sort_by_key(|b| std::cmp::Reverse(b.total_delta.abs()));
         for f in files.into_iter().take(10) {
             println!(
                 "| {} | {} | {} | {} | {} | {} | {} |",
@@ -435,10 +442,10 @@ fn print_markdown(s: &DiffSummary) {
     }
 }
 
-fn emit_output(args: &super::DiffArgs, summary: &DiffSummary) {
+fn emit_output(args: &DiffArgs, summary: &DiffSummary) {
     if args.json {
         if let Ok(s) = serde_json::to_string_pretty(summary) {
-            println!("{}", s);
+            println!("{s}");
         }
         return;
     }

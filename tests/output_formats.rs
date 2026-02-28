@@ -11,7 +11,7 @@ fn json_and_csv_outputs_work() {
         .expect("run json");
     assert!(out_json.status.success());
     let s = String::from_utf8_lossy(&out_json.stdout);
-    assert!(s.trim_start().starts_with("{"));
+    assert!(s.trim_start().starts_with('{'));
     assert!(s.contains("\"languages\""));
     assert!(s.contains("\"totals\""));
 

@@ -1,3 +1,5 @@
+#![allow(clippy::missing_errors_doc, clippy::must_use_candidate)]
+
 use anyhow::{Context, Result, anyhow};
 use git2::{Delta, DiffOptions, Oid, Repository};
 use std::path::{Path, PathBuf};
@@ -91,6 +93,7 @@ impl VcsContext {
         self.collect_changes_from_diff(diff)
     }
 
+    #[allow(clippy::unused_self, clippy::match_same_arms)]
     fn collect_changes_from_diff(&self, mut diff: git2::Diff) -> Result<Vec<FileChange>> {
         let mut out = Vec::new();
         // Enable rename detection so we can report 'R' statuses
@@ -109,19 +112,19 @@ impl VcsContext {
                     _ => "M",
                 }
                 .to_string();
-                let old_path = d.old_file().path().map(|p| p.to_path_buf());
-                let new_path = d.new_file().path().map(|p| p.to_path_buf());
+                let old_path = d.old_file().path().map(Path::to_path_buf);
+                let new_path = d.new_file().path().map(Path::to_path_buf);
                 let old_id = d.old_file().id();
                 let new_id = d.new_file().id();
-                let old_oid = if old_id.is_zero() { None } else { Some(old_id) };
-                let new_oid = if new_id.is_zero() { None } else { Some(new_id) };
+                let old_option_id = if old_id.is_zero() { None } else { Some(old_id) };
+                let new_option_id = if new_id.is_zero() { None } else { Some(new_id) };
                 out.push(FileChange {
                     status,
                     old_path,
                     new_path,
                     oids: FileChangeOids {
-                        old: old_oid,
-                        new: new_oid,
+                        old: old_option_id,
+                        new: new_option_id,
                     },
                 });
                 true

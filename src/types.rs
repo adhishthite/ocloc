@@ -11,14 +11,15 @@ pub struct FileCounts {
 }
 
 impl FileCounts {
+    #[must_use]
     pub fn one_file() -> Self {
-        FileCounts {
+        Self {
             files: 1,
             ..Default::default()
         }
     }
 
-    pub fn merge(&mut self, other: &FileCounts) {
+    pub const fn merge(&mut self, other: &Self) {
         self.files += other.files;
         self.total += other.total;
         self.code += other.code;
